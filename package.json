@@ -1,0 +1,79 @@
+{
+  "name": "@pipilu123566/dsh-balance",
+  "version": "1.0.0",
+  "description": "Provider balances in the DeepSeek Harness sidebar",
+  "type": "module",
+  "engines": {
+    "node": ">=22",
+    "dsh": "0.2.1-rc.5"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "balances.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE",
+    "CONTRIBUTING.md",
+    "docs/",
+    "balance.test.js",
+    "lifecycle.test.js",
+    "pnpm-lock.yaml",
+    ".node-version"
+  ],
+  "scripts": {
+    "test": "node --test balance.test.js lifecycle.test.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-settings-account"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.5"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.5",
+    "@deepseek-ai/dsh-llm": "0.2.1-rc.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.5"
+  },
+  "license": "MIT",
+  "author": "pipilu123566",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pipilu123566/dsh-balance.git"
+  },
+  "homepage": "https://github.com/pipilu123566/dsh-balance#readme",
+  "bugs": {
+    "url": "https://github.com/pipilu123566/dsh-balance/issues"
+  },
+  "keywords": [
+    "deepseek",
+    "deepseek-harness",
+    "dsh",
+    "plugin",
+    "balance",
+    "openrouter",
+    "siliconflow"
+  ]
+}
