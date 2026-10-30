@@ -16,9 +16,9 @@
 
 | 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
 | --- | --- | --- | --- |
-| [DSH Balance](dsh-balance/README.md) | 在侧栏集中查看已配置厂商的账户余额 | [1.0.0 Release](https://github.com/pipilu123566/dsh-balance/releases/tag/v1.0.0) | DeepSeek Harness 0.2.1-rc.5 |
+| [DSH Balance](dsh-balance/README.md) | 查看账户余额、今日及会话消耗，配置模型单价 | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
 
-余额插件已迁入 [`dsh-balance/`](dsh-balance/)，原公开提交历史保留。原仓库继续提供 1.0.0 下载、固定版本截图和验收记录；后续源码与问题反馈统一在本仓库维护。本次整理未新增或替换安装包。
+各插件的功能、安装步骤和支持范围见对应目录的说明。
 
 仓库根目录不是插件。安装时进入对应插件说明，下载该插件的 Release `.tgz`，不要把本仓库根地址直接交给插件安装命令。已发布版本的支持范围以其 README 和验收记录为准。
 

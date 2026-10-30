@@ -26,6 +26,15 @@ export function adapterFor(baseURL) {
   if (!spec || !['', '/', '/v1', '/v1/', '/api/v1', '/api/v1/'].includes(url.pathname)) return null;
   return { kind: spec[0], url: url.origin + spec[1] };
 }
+// Explanation only: this does not authorize or perform a billing request.
+export function unsupportedReason(baseURL) {
+  let url;
+  try { url = new URL(baseURL); } catch { return undefined; }
+  if (url.protocol !== 'https:' || url.username || url.password || url.port || url.search || url.hash || !/^\/compatible-mode\/v1\/?$/.test(url.pathname)) return undefined;
+  const host = url.hostname;
+  if (['dashscope.aliyuncs.com', 'dashscope-intl.aliyuncs.com', 'dashscope-us.aliyuncs.com'].includes(host) || /^[a-z0-9-]+\.[a-z0-9-]+\.maas\.aliyuncs\.com$/.test(host)) return 'aliyunBilling';
+  return undefined;
+}
 export function parseBalance(kind, data) {
   if (kind === 'deepseek') {
     if (typeof data?.is_available !== 'boolean' || !Array.isArray(data.balance_infos) || !data.balance_infos.length) throw new Error('invalid-balance');

@@ -16,9 +16,9 @@ I am a programming beginner, and all these plugins were developed using AI. Feed
 
 | Plugin | Purpose | Published version and installation | Compatible host |
 | --- | --- | --- | --- |
-| [DSH Balance](dsh-balance/README.en.md) | View configured provider balances in the sidebar | [1.0.0 Release](https://github.com/pipilu123566/dsh-balance/releases/tag/v1.0.0) | DeepSeek Harness 0.2.1-rc.5 |
+| [DSH Balance](dsh-balance/README.en.md) | View balances, daily and session costs, and configure model prices | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
 
-DSH Balance source now lives in [`dsh-balance/`](dsh-balance/README.en.md), with its original public commit history preserved. The original repository continues to host the 1.0.0 download, fixed-version screenshots and validation record. Ongoing source changes and issue reports belong in this repository. This reorganization did not create or replace an installable release.
+See each plugin's documentation for its features, installation steps and support scope.
 
 The repository root is not a plugin. Follow the selected plugin's documentation and download its Release `.tgz`; do not pass the collection's root URL directly to the plugin installer. Support claims are defined by each published version's README and validation record.
 

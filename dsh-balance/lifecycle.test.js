@@ -39,7 +39,7 @@ async function mountBalance(ctx) {
   const service = ctx.get('pipiluBalance');
   assert.ok(service instanceof TypertRemoteService);
   assert.equal(service.typertRemote.namespace, 'pipiluBalance');
-  assert.deepEqual(remoteMethods(service).map(marker => marker.method), ['snapshot']);
+  assert.deepEqual(remoteMethods(service).map(marker => marker.method), ['snapshot', 'usageSummary', 'pricing', 'savePrice']);
   return { fiber, service };
 }
 
@@ -137,4 +137,47 @@ test('a cached balance never carries over when the plugin is disposed and mounte
   assert.equal(calls, 2, 'the same credential must be queried again after remount');
   await second.fiber.dispose();
   assert.equal(ctx.get('pipiluBalance'), undefined);
+});
+
+test('custom price writes use revision checks and can be read back and removed without model or balance requests', async t => {
+  const ctx = new Context();
+  t.after(() => ctx.fiber.dispose());
+  const config = { prices: {} };
+  let revision = 3, mutations = 0;
+  ctx.provide('llm', {
+    listProviders: () => [{ id: 'generic-provider' }],
+    listModels: async () => [{ provider: 'generic-provider', id: 'example-model' }],
+  });
+  ctx.provide('credentials', { resolve: () => { throw new Error('unexpected credential read'); } });
+  ctx.provide('settings', {
+    describe: () => [{ ns: 'pipilu-balance', revision, value: config }],
+    mutate: async (namespace, operations, expectedRevision) => {
+      assert.equal(namespace, 'pipilu-balance');
+      if (expectedRevision !== revision) throw new Error('revision-conflict');
+      mutations++;
+      for (const operation of operations) {
+        assert.equal(operation.path[0], 'prices');
+        const key = operation.path[1];
+        config.prices = { ...config.prices };
+        if (operation.op === 'unset') delete config.prices[key];
+        else { assert.equal(operation.op, 'set'); config.prices[key] = operation.value; }
+      }
+      revision++;
+    },
+  });
+  t.mock.method(globalThis, 'fetch', () => { throw new Error('unexpected network request'); });
+  const service = new BalanceService(ctx, config), key = 'generic-provider/example-model';
+  assert.deepEqual(await service.pricing(), { prices: {}, models: [key], revision: 3 });
+  const saved = await service.savePrice(key, { currency: 'CNY', input: '2', output: '4', cacheRead: '0' }, 3);
+  assert.deepEqual(saved.prices[key], { currency: 'CNY', input: 2, output: 4, cacheRead: 0 });
+  assert.equal(saved.revision, 4);
+  await assert.rejects(service.savePrice(key, null, 3), /revision-conflict/);
+  await assert.rejects(service.savePrice(key, null, -1), /invalid-revision/);
+  await assert.rejects(service.savePrice(key, { currency: 'CNY', input: '', output: '4' }, 4), /invalid-price/);
+  assert.equal(mutations, 1);
+  assert.deepEqual((await service.pricing()).prices[key], saved.prices[key]);
+  const removed = await service.savePrice(key, null, 4);
+  assert.deepEqual(removed.prices, {});
+  assert.equal(removed.revision, 5);
+  assert.equal(mutations, 2);
 });

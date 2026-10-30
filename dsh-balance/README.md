@@ -2,74 +2,85 @@
 
 中文 | [English](README.en.md)
 
-当前源码统一在 `deepseek-harness-plugin/dsh-balance` 维护。已发布的 1.0.0 安装包继续从原仓库下载；本次目录整理未替换或重新发布该版本。
+在 DeepSeek Harness 侧栏查看账户余额、今日模型费用和会话消耗，并为不同模型设置单价。
 
-[下载版本](https://github.com/pipilu123566/dsh-balance/releases) · [问题反馈](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
+[下载 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [问题反馈](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
 
-在 DeepSeek Harness 侧栏集中查看已配置厂商的账户余额。
+![余额与今日消耗，使用演示数据](docs/images/balance-1.1.0-demo.png)
 
-**非官方社区插件，由社区成员独立开发和维护，与 DeepSeek 无隶属关系，未获官方背书。**
-
-![DSH Balance 在隔离 Harness 实例中显示演示余额](docs/images/balance-demo.jpg)
-
-截图来自实际运行的隔离 Harness 实例，使用演示余额，不含真实账户信息，也不代表真实厂商查询结果。
+截图使用演示数据，不含真实账户信息。
 
 ## 功能
 
-- 悬浮或键盘聚焦钱包按钮展开面板，点击固定。
-- 集中查看 DeepSeek 登录账户、DeepSeek API、OpenRouter 和硅基流动配置。
-- 支持手动刷新；面板打开期间每分钟更新，关闭后停止轮询。
-- 不同币种和钱包类别分开显示，不换算汇率，不估算剩余 Token。
-- 分别显示凭据缺失、不支持、限流和失败，不把错误显示为零余额。
+- 侧栏钱包按钮支持悬浮、键盘聚焦和点击固定；按 Escape、点击关闭或面板外部收起。
+- 概览显示各已配置来源的可用余额和今日消耗。展开来源可查看充值、赠送及更新时间；同一来源配置多个模型仍只显示一行。
+- 今日消耗可按模型或会话查看，会话还可展开模型明细；每轮回复尾部显示该轮费用。
+- 在「单价」中按精确的厂商／模型配置输入、输出、缓存命中和缓存创建价格，保存后重算费用，重启后保留。
+- 概览金额保留两位小数，展开明细保留精度；不同币种分别展示，不换算汇率。
+- 来源列表和消耗明细限高滚动；支持手动刷新，面板打开期间每分钟更新，关闭后停止轮询。
+- 缺少凭据、不支持、限流、查询失败、未定价和缺失用量分别提示，不显示为零余额或零消耗。
 
 ## 兼容范围
 
-1.0.0 仅声明兼容 **DeepSeek Harness 0.2.1-rc.5**。侧栏使用公开 footer 槽位，余额入口独占账户按钮上方一行；后续宿主版本需重新验收。
+1.1.0 仅声明兼容 **DeepSeek Harness 0.2.1-rc.5**，余额入口位于侧栏底部账户按钮上方的独立行。其他宿主版本需要重新验证。
 
-本次发行验收使用 macOS 上的隔离 Harness Web profile 和实际安装包，具体范围见[验收记录](docs/validation.md)。自动测试不使用 DeepSeek API Key、OpenRouter 或硅基流动的真实账户凭据。
+这些插件首先服务于作者自己的使用需求，未做全面适配测试。公开版本的实际测试平台、安装和交互覆盖见[验收记录](docs/validation.md)。
 
-## 安装
+## 安装与升级
 
-1. 从 Release 下载 [`pipilu123566-dsh-balance-1.0.0.tgz`](https://github.com/pipilu123566/dsh-balance/releases/download/v1.0.0/pipilu123566-dsh-balance-1.0.0.tgz)。这是可安装插件包；GitHub 自动生成的源码压缩包用于源码查阅。
+1. 从 Release 下载 [`pipilu123566-dsh-balance-1.1.0.tgz`](https://github.com/pipilu123566/deepseek-harness-plugin/releases/download/%40pipilu123566%2Fdsh-balance%401.1.0/pipilu123566-dsh-balance-1.1.0.tgz)。这是可安装插件包；GitHub 自动生成的源码压缩包不能代替它。
 2. 完全退出 Harness，在下载目录执行：
 
    ```sh
-   dsh plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
+   dsh plugin --profile desktop add ./pipilu123566-dsh-balance-1.1.0.tgz --ignore-scripts
    ```
 
-3. 重新打开 Harness，在侧栏底部账户区域上方找到钱包按钮。厂商连接仍通过 Harness 原有设置配置。
+3. 重新打开 Harness，在侧栏底部找到钱包按钮。厂商连接仍通过 Harness 原有设置配置。
 
 macOS 若没有 `dsh` 命令，可使用应用自带 CLI：
 
 ```sh
-'/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh' plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
+'/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh' plugin --profile desktop add ./pipilu123566-dsh-balance-1.1.0.tgz --ignore-scripts
 ```
 
-使用已有 Web profile 时，将 `desktop` 换成其名称，并在包变更前后停止、重启该实例。同一 profile 只使用一个余额 bundle。升级时按相同步骤安装新版包，不自行扩大宿主兼容范围。
+已有公开版 1.0.0 按相同步骤安装新版。使用已有 Web profile 时，将 `desktop` 换成其名称，并在包变更前后停止、重启实例。同一 profile 只保留一个余额 bundle；不要将父仓库根地址作为插件安装。
 
-卸载前退出目标实例，然后执行以下命令并重新打开：
+卸载前退出目标实例，然后执行并重新打开：
 
 ```sh
 dsh plugin --profile desktop remove @pipilu123566/dsh-balance
 ```
 
-## 厂商支持
+## 余额来源
 
 | 厂商 | 来源 | 条件与限制 |
 | --- | --- | --- |
-| DeepSeek 登录账户 | Harness 账户服务 | 通过 Harness 登录；充值和赠送钱包分别显示 |
-| DeepSeek API | 官方 `/user/balance` | 配置官方 API Key；展示可用、充值和赠送余额 |
-| OpenRouter | 官方 `/api/v1/credits` | 需要管理密钥；普通密钥可能无权查询；展示总充值减总消费 |
+| DeepSeek 登录账户 | Harness 账户服务 | 通过 Harness 登录；按币种显示充值与赠送钱包 |
+| DeepSeek API | 官方 `/user/balance` | 配置官方 API Key；显示可用、充值和赠送余额 |
+| OpenRouter | 官方 `/api/v1/credits` | 需要管理密钥；普通密钥可能无权查询；显示总充值减总消费 |
 | 硅基流动 | 官方 `/v1/user/info` | 配置 `api.siliconflow.cn` 密钥；金额为 CNY |
-| 其他已配置厂商 | 不猜测私有接口 | 显示暂不支持；未配置的目录项不展示 |
+| 百炼／Qwen | 尚未接入余额查询 | 模型调用密钥不能直接查询阿里云账户现金余额；不将账户余额与 Token Plan / Coding Plan 混用 |
+| 其他已配置厂商 | 暂不支持余额查询 | 不猜测私有接口；仍可为其模型配置单价并估算已记录用量的费用 |
 
-接口来源：[DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/)、[OpenRouter](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits)、[硅基流动](https://github.com/siliconflow/siliconcloud/blob/main/openapi.yaml)。
+接口来源：[DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/)、[OpenRouter](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits)、[硅基流动](https://github.com/siliconflow/siliconcloud/blob/main/openapi.yaml)、[阿里云账户余额](https://help.aliyun.com/zh/user-center/developer-reference/api-bssopenapi-2017-12-14-queryaccountbalance)。
 
-插件拒绝自定义反向代理、非标准端口、URL 内嵌凭据和接口重定向。各厂商凭据仅发送到对应 HTTPS 白名单端点。密钥留在 Host，Client 仅接收有限的余额与状态字段；插件不增加分析追踪或独立后端。
+插件只查询已配置的来源。凭据仅发送到对应 HTTPS 白名单端点；拒绝自定义反向代理、非标准端口、URL 内嵌凭据和接口重定向。余额是带更新时间的查询快照，不代表账户的实时变化。
 
-## 开发
+## 消耗与计价
 
-使用仓库声明的 Node **22.21.1**、pnpm **10.33.2** 和锁文件；运行依赖与目标 Harness 版本一致。
+金额是**模型费用估算，不是厂商扣款账单**。统计范围为当前宿主可访问的会话及其中已记录的模型用量；不包含其他设备、未记录请求，以及搜索、抓取等工具费用。当日按北京时间划分，fork 继承调用不重复计费；推理用量已包含在输出中，不另加一次。
+
+未上报用量、缺少单价和会话读取失败均保留提示。混合结果只汇总已计价部分，并标明部分估算；人民币和美元不合计。会话列表只显示当日有调用的会话，标题来自宿主投影；未命名会话保留明确提示。
+
+内置 DeepSeek 官方路线价格采用 [2026-10-30 核对的官方人民币价格](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/)，按北京时间峰谷时段计算；内置日期覆盖为 2026-09-19 至 2026-12-31。超出日期范围、未知模型和第三方同名模型不会自动套用该价格。价格可能变动，可在「单价」中显式覆盖；本插件不自动更新价格表。
+
+自定义单价按精确 `provider/model` 保存，支持 CNY、USD，单位为所选币种／百万 Token，最多 8 位小数。输入、输出为必填项；缓存价格留空表示未定价，填 `0` 才表示免费。保存会重新计算已有记录；当前配置不能还原厂商过去的价格和真实账单。恢复默认后，官方路线使用内置价格，其他路线保持未定价。并发配置变更会拒绝覆盖，需要重新载入后再编辑。
+
+## 数据与开发
+
+API Key 和原始厂商响应留在 Host；页面接收余额、用量、模型标识和会话标题等展示字段，不返回会话正文。插件不增加分析追踪或独立后端；余额查询不追加会话事件，单价通过 Harness 设置服务保存。
+
+使用仓库声明的 Node **22.21.1**、pnpm **10.33.2** 和锁文件，在插件目录执行：
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -77,9 +88,7 @@ pnpm test
 pnpm pack --out /path/to/output/dsh-balance.tgz
 ```
 
-bundle 注册 Cordis Host 服务，通过 Typert 提供只读接口，并使用 `sidebar.footer.action` 槽位。Client 复用宿主 React、主题和语言服务；卸载时清理计时器、监听器、浮层、缓存及在途请求。
-
-发行前用新的 `DSH_HOME` 安装实际 tarball，不复制真实账户数据。本机 `link:` 成功不代替安装包验收。详见[贡献说明](CONTRIBUTING.md)与[验收记录](docs/validation.md)。
+Host 使用 Cordis、Typert、会话查询与投影服务；Client 复用宿主 React、主题及语言服务，在侧栏和回复尾部的公开槽位显示内容。卸载时释放监听器、计时器、浮层、观察租约和在途请求。详见[贡献说明](CONTRIBUTING.md)与[验收记录](docs/validation.md)。
 
 ## 许可证
 

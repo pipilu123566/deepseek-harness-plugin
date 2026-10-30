@@ -1,7 +1,7 @@
 {
   "name": "@pipilu123566/dsh-balance",
-  "version": "1.0.0",
-  "description": "Provider balances in the DeepSeek Harness sidebar",
+  "version": "1.1.0",
+  "description": "Provider balances and daily spending by model and session in DeepSeek Harness",
   "type": "module",
   "engines": {
     "node": ">=22",
@@ -30,10 +30,15 @@
     "balance.test.js",
     "lifecycle.test.js",
     "pnpm-lock.yaml",
-    ".node-version"
+    ".node-version",
+    "usage.js",
+    "usage.test.js",
+    "pricing.js",
+    "pricing.test.js",
+    "client.test.js"
   ],
   "scripts": {
-    "test": "node --test balance.test.js lifecycle.test.js"
+    "test": "node --test balance.test.js lifecycle.test.js usage.test.js pricing.test.js client.test.js"
   },
   "dsh": {
     "bundle": {
@@ -44,7 +49,8 @@
       "immediately": true,
       "inject": [
         "@deepseek-ai/dsh-client-ui-sidebar",
-        "@deepseek-ai/dsh-client-ui-settings-account"
+        "@deepseek-ai/dsh-client-ui-settings-account",
+        "@deepseek-ai/dsh-client-ui-chat"
       ]
     }
   },
@@ -76,6 +82,12 @@
     "plugin",
     "balance",
     "openrouter",
-    "siliconflow"
-  ]
+    "siliconflow",
+    "usage",
+    "cost-estimation"
+  ],
+  "dependencies": {
+    "@deepseek-ai/schemastery": "3.18.5",
+    "zod": "4.6.7"
+  }
 }

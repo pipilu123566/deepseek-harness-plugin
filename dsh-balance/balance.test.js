@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { adapterFor, parseBalance, queryBalance, balanceCache, subtract } from './balances.js';
+import { adapterFor, parseBalance, queryBalance, balanceCache, subtract, unsupportedReason } from './balances.js';
 
 test('exact endpoint allowlist rejects relays, credentials, ports and query strings', () => {
   assert.equal(adapterFor('https://api.deepseek.com/v1').url, 'https://api.deepseek.com/user/balance');
@@ -110,9 +110,8 @@ test('client uses the requested footer slot and opens on hover with click-to-pin
     useId: () => 'balance-dialog', useCallback: fn => fn, useEffect: () => {}, useLayoutEffect: () => {},
   };
   runInNewContext(readFileSync(new URL('./client.js', import.meta.url), 'utf8'), { window: { __ModuleLoader__: { load: value => { module = value; } } }, document: { activeElement: null }, setTimeout: fn => { later = fn; }, clearTimeout: () => {} });
-  assert.equal(module.id, '@pipilu123566/dsh-balance');
   const plugin = module.factory(name => { assert.equal(name, 'react'); return React; });
-  plugin.apply({ locale: { register: () => {} }, slots: { inject: (name, callback) => { assert.equal(name, 'sidebar.footer.action'); callback(); }, register: (options, component) => { registration = options; View = component; } } });
+  plugin.apply({ locale: { register: () => {} }, slots: { inject: (name, callback) => { assert.ok(['sidebar.footer.action', 'conversation.chat.turnTail'].includes(name)); callback(); }, register: (options, component) => { if (options.name === 'sidebar.footer.action') { registration = options; View = component; } } } });
   assert.equal(registration.id, 'pipilu-balance');
   const props = { wide: true, t: key => key, connection: {}, locale: {} };
   const render = () => { cursor = 0; return View(props); };
@@ -126,4 +125,25 @@ test('client uses the requested footer slot and opens on hover with click-to-pin
   tree.children.find(x => x?.type === 'button').props.onClick(); tree = render();
   tree.props.onPointerLeave(); later(); tree = render();
   assert.ok(section(tree));
+});
+
+
+test('Aliyun inference providers explain separate billing access without sending model keys', async t => {
+  const endpoint = 'https://workspace-test.cn-beijing.maas.aliyuncs.com/compatible-mode/v1';
+  for (const url of [endpoint, 'https://dashscope.aliyuncs.com/compatible-mode/v1/']) assert.equal(unsupportedReason(url), 'aliyunBilling');
+  for (const url of ['https://qwen.proxy.test/compatible-mode/v1', endpoint + '?key=test', endpoint.replace('aliyuncs.com', 'aliyuncs.com.evil.test'), endpoint.replace('https:', 'http:')]) assert.equal(unsupportedReason(url), undefined);
+  let requests = 0;
+  t.mock.method(globalThis, 'fetch', async () => { requests++; throw new Error('Unexpected request'); });
+  const { Context } = await import('@deepseek-ai/cordis');
+  const { default: BalanceService } = await import('./index.js');
+  const ctx = new Context();
+  t.after(() => ctx.fiber.dispose());
+  ctx.provide('llm', { listConfigurableProviders: () => [{ provider: 'qwen', settingsNs: 'test-qwen', settingsPath: [] }] });
+  ctx.provide('settings', { describe: () => [{ ns: 'test-qwen', value: { baseURL: endpoint, apiKeyEnv: 'TEST_MODEL_KEY', models: Array.from({ length: 30 }, (_, i) => ({ id: 'model-' + i })) } }] });
+  ctx.provide('credentials', { resolve: async () => ({ value: 'test-only-inference-key' }) });
+  const service = new BalanceService(ctx);
+  const snapshot = await service.snapshot({ locale: 'zh', timezoneOffsetSeconds: 28800 });
+  assert.deepEqual(snapshot.providers, [{ id: 'qwen', name: 'qwen', kind: 'thirdParty', status: 'unsupported', reason: 'aliyunBilling' }]);
+  assert.equal(requests, 0);
+  assert.ok(!JSON.stringify(snapshot).includes('test-only-inference-key'));
 });

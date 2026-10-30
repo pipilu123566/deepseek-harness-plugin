@@ -2,74 +2,85 @@
 
 [中文](README.md) | English
 
-Current source is maintained in `deepseek-harness-plugin/dsh-balance`. The released 1.0.0 package remains available from the original repository; this source move does not replace that release.
+View account balances, today's model costs and session spending from the DeepSeek Harness sidebar, and configure prices for individual models.
 
-[Releases](https://github.com/pipilu123566/dsh-balance/releases) · [Report a problem](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
+[Download 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [Report a problem](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
 
-See the balances of your configured providers from the sidebar, without leaving DeepSeek Harness.
+![Balances and daily spending using demonstration data](docs/images/balance-1.1.0-demo.png)
 
-**Unofficial community plugin. Independently developed and maintained; not affiliated with or endorsed by DeepSeek.**
+The screenshot uses demonstration data and contains no real account information.
 
-![DSH Balance running in an isolated Harness profile with demonstration data](docs/images/balance-demo.jpg)
+## Features
 
-The screenshot uses demonstration balances in a real, isolated Harness instance. It does not show a real account or prove a live provider query.
-
-## What it does
-
-- Hover or focus the wallet button to open balances; click to pin the panel.
-- View your DeepSeek signed-in account, DeepSeek API, OpenRouter and SiliconFlow configuration in one place.
-- Refresh on demand. While the panel is open, refresh once a minute; stop polling when it closes.
-- Keep currencies and wallet categories separate. No currency conversion or estimated token counts.
-- Show missing credentials, unsupported providers, rate limits and errors explicitly, never as a zero balance.
+- Hover, focus or click the wallet button to open or pin the panel. Close it with Escape, the close button or an outside click.
+- See available balances and daily spending in the overview. Expand a provider for wallet details and timestamps; multiple models from one provider share a single balance row.
+- View daily costs by model or session, expand a session for its model breakdown, and see costs at the end of each assistant turn.
+- Set input, output, cache-read and cache-write prices for an exact provider/model in the price editor. Saving recalculates estimates and persists across restarts.
+- Overview amounts use two decimal places; expanded details retain precision. Currencies remain separate without exchange-rate conversion.
+- Provider and cost lists scroll within a bounded area. Refresh manually or once per minute while the panel is open; polling stops when it closes.
+- Missing credentials, unsupported providers, rate limits, failures, missing prices and missing usage remain explicit instead of appearing as zero balances or zero costs.
 
 ## Compatibility
 
-Version 1.0.0 targets **DeepSeek Harness 0.2.1-rc.5**. Later Harness versions are not claimed compatible. The sidebar uses the public footer slot, with a separate row above the account button.
+1.1.0 declares compatibility only with **DeepSeek Harness 0.2.1-rc.5**. The wallet occupies its own sidebar footer row above the account button. Other host versions need separate verification.
 
-Release validation uses the actual package in an isolated Harness Web profile on macOS. See [validation](docs/validation.md) for the exact checks and limitations. Real DeepSeek API Key, OpenRouter and SiliconFlow credentials are not part of the automated tests.
+These plugins are primarily built for the author's own needs and have not undergone comprehensive compatibility testing. See the [validation record](docs/validation.en.md) for the public release's tested platforms, installation and interaction coverage.
 
-## Install
+## Install or upgrade
 
-1. Download [`pipilu123566-dsh-balance-1.0.0.tgz`](https://github.com/pipilu123566/dsh-balance/releases/download/v1.0.0/pipilu123566-dsh-balance-1.0.0.tgz) from the release. This is the installable package; GitHub's automatic source archives serve a different purpose.
-2. Fully quit Harness before changing its desktop profile. In the download directory, run:
+1. Download [`pipilu123566-dsh-balance-1.1.0.tgz`](https://github.com/pipilu123566/deepseek-harness-plugin/releases/download/%40pipilu123566%2Fdsh-balance%401.1.0/pipilu123566-dsh-balance-1.1.0.tgz) from the Release. This is the installable plugin package; GitHub's automatically generated source archive is not a substitute.
+2. Fully quit Harness, then run this from the download directory:
 
    ```sh
-   dsh plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
+   dsh plugin --profile desktop add ./pipilu123566-dsh-balance-1.1.0.tgz --ignore-scripts
    ```
 
-3. Reopen Harness. Look for the wallet button above the account area at the bottom of the sidebar. Configure your providers using Harness's normal settings.
+3. Reopen Harness and find the wallet button at the bottom of the sidebar. Configure provider connections in the existing Harness settings.
 
-On macOS, if `dsh` is not on your PATH, use the CLI included with the application:
+On macOS, if `dsh` is not on your PATH, use the application's CLI:
 
 ```sh
-'/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh' plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
+'/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh' plugin --profile desktop add ./pipilu123566-dsh-balance-1.1.0.tgz --ignore-scripts
 ```
 
-For an existing Web profile, replace `desktop` with its name and stop/restart that instance around package changes. Use only one balance bundle in a profile. To upgrade, install the new release package using the same procedure; do not widen the declared Harness compatibility range yourself.
+Upgrade public version 1.0.0 using the same steps. For an existing Web profile, replace `desktop` with its name and stop/restart that instance around package changes. Keep only one balance bundle in a profile. Do not install the parent repository root as a plugin.
 
-To uninstall, quit the target instance, run the following, and reopen it:
+To uninstall, quit the target instance, run this command and reopen it:
 
 ```sh
 dsh plugin --profile desktop remove @pipilu123566/dsh-balance
 ```
 
-## Provider support
+## Balance sources
 
 | Provider | Source | Requirements and limits |
 | --- | --- | --- |
-| DeepSeek signed-in account | Harness account service | Sign in using Harness; topped-up and bonus wallets are shown separately |
-| DeepSeek API | Official `/user/balance` | A configured official API key; available, topped-up and granted balances |
-| OpenRouter | Official `/api/v1/credits` | A management key is required; ordinary keys may be denied; displays purchased credits minus usage |
-| SiliconFlow | Official `/v1/user/info` | A configured key for `api.siliconflow.cn`; balances are in CNY |
-| Other configured providers | No speculative requests | Shown as unsupported; unconfigured catalog entries are hidden |
+| DeepSeek signed-in account | Harness account service | Sign in through Harness; top-up and granted wallets are shown by currency |
+| DeepSeek API | Official `/user/balance` | Official API key; available, top-up and granted balances |
+| OpenRouter | Official `/api/v1/credits` | Requires a management key; ordinary keys may be denied; total credits minus usage |
+| SiliconFlow | Official `/v1/user/info` | Key for `api.siliconflow.cn`; amounts in CNY |
+| Alibaba Cloud Bailian / Qwen | Balance query not integrated | A model API key cannot directly query the cloud account's cash balance; account funds and Token Plan / Coding Plan quotas are distinct |
+| Other configured providers | Balance query unsupported | No guessed private endpoints; model prices can still be configured to estimate recorded usage |
 
-Official endpoints: [DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/), [OpenRouter](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits), [SiliconFlow](https://github.com/siliconflow/siliconcloud/blob/main/openapi.yaml).
+API references: [DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/), [OpenRouter](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits), [SiliconFlow](https://github.com/siliconflow/siliconcloud/blob/main/openapi.yaml), [Alibaba Cloud account balance](https://help.aliyun.com/zh/user-center/developer-reference/api-bssopenapi-2017-12-14-queryaccountbalance).
 
-Custom proxies, nonstandard ports, embedded URL credentials and redirected API requests are rejected. The plugin only sends each provider's credential to its matching allowlisted HTTPS endpoint. Keys stay on the host; the client receives a limited balance/status response. No analytics or separate backend is added by this plugin.
+Only configured providers are queried. Credentials go only to the corresponding allowlisted HTTPS endpoint. Custom reverse proxies, nonstandard ports, credentials embedded in URLs and redirects are rejected. A balance is a timestamped snapshot, not a live account-change feed.
 
-## Development
+## Usage and pricing
 
-Use Node **22.21.1** and pnpm **10.33.2**, as declared in this repository. Runtime dependencies use the target Harness version.
+Amounts are **model-cost estimates, not provider billing statements**. They cover recorded model usage in sessions accessible to the current host, excluding other devices, unrecorded requests and tool charges such as search or fetch. Days use Beijing time. Inherited fork calls are not charged twice, and reasoning tokens already included in output are not counted again.
+
+Missing usage, missing prices and unreadable sessions remain visible. Mixed results total only priced calls and indicate partial estimates. CNY and USD are never added together. Session lists include only sessions with calls that day, use titles from the host projection, and label untitled sessions explicitly.
+
+Built-in prices for official DeepSeek routes use the [official CNY prices checked on 2026-10-30](https://api-docs.deepseek.com/zh-cn/quick_start/pricing/), including Beijing peak/off-peak periods. The built-in date range is 2026-09-19 through 2026-12-31. Outside that range, unknown models and identically named models on third-party routes do not automatically receive these prices. Prices may change; override them in the price editor as needed. The plugin does not automatically update its price table.
+
+Custom prices are keyed by exact `provider/model`, support CNY and USD, and use currency per million tokens with up to eight decimal places. Input and output prices are required. An empty cache price means unpriced; enter `0` only for a free category. Saving recalculates existing records with the current settings, which cannot reconstruct historical provider tariffs or actual bills. Reset restores built-in pricing on supported official routes and leaves other routes unpriced. Concurrent configuration changes are rejected; reload before editing again.
+
+## Data and development
+
+API keys and raw provider responses stay on the Host. The client receives display fields such as balances, usage, model identifiers and session titles, not conversation bodies. The plugin adds no analytics or separate backend. Balance queries do not append session events; prices are saved through Harness settings.
+
+Use the pinned Node **22.21.1**, pnpm **10.33.2** and lockfile inside the plugin directory:
 
 ```sh
 pnpm install --frozen-lockfile --ignore-scripts
@@ -77,9 +88,7 @@ pnpm test
 pnpm pack --out /path/to/output/dsh-balance.tgz
 ```
 
-The bundle registers a Cordis host service, exposes a read-only Typert method and uses the `sidebar.footer.action` client slot. The client reuses Harness React, theme and locale services. Disposal clears timers, listeners, the popup, caches and in-flight network requests.
-
-Test an actual tarball in a new `DSH_HOME` with no copied account data before releasing. Development `link:` installs are not package validation. See [contributing](CONTRIBUTING.md) and [validation](docs/validation.md).
+The Host uses Cordis, Typert, session queries and projections. The client reuses the host's React, theme and locale services and renders in public sidebar and turn-tail slots. Disposal releases listeners, timers, popovers, observation leases and in-flight requests. See [contributing](CONTRIBUTING.md) and the [validation record](docs/validation.en.md).
 
 ## License
 

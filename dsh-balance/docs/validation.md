@@ -1,37 +1,34 @@
-# Release validation — 1.0.0
+# 1.1.0 验收记录
 
-Validated on 2026-10-30 with DeepSeek Harness **0.2.1-rc.5**, macOS and Chrome. Development tooling: Node 22.21.1 / pnpm 10.33.2. The application's bundled package manager performs profile installation.
+中文 | [English](validation.en.md)
 
-## Results
+验收日期：2026-10-30。目标宿主：DeepSeek Harness **0.2.1-rc.5**。环境：macOS 上的隔离 Web profile、Node 22.21.1、pnpm 10.33.2；安装使用宿主自带包管理器。
 
-| Check | Result and evidence |
+## 已验证
+
+| 检查 | 结果 |
 | --- | --- |
-| Automated checks | 9 tests passed: endpoint allowlist, money parsing, failure states, cache isolation, unknown providers, account wallets, client registration, abort on disposal and fresh remount |
-| Install | An actual `.tgz` was installed with the official CLI into an isolated profile; no `link:` dependency or copied account configuration |
-| Shared host APIs | Cordis context, LLM service and Typert service identity checks passed; imports resolved to the installed Harness runtime |
-| No credentials | Real RPC returned the DeepSeek account as `signedOut`; the interface showed the sign-in state without fabricated balances |
-| Demonstration data | A separate, unpublished fixture supplied DeepSeek wallet, OpenRouter and SiliconFlow sample responses to the real host and client; the panel rendered separate currencies and wallet categories |
-| Interaction | Open, pin, manual refresh, Escape with focus restoration, keyboard reopening and collapsed sidebar operation were exercised in Chrome |
-| Layout | Wallet button occupies a separate footer row above the account button; expanded and collapsed layouts were inspected |
-| Removal | After removal and host restart, the wallet entry disappeared and the balance RPC returned HTTP 404 |
-| Lifecycle | Tests verify cancellation of an in-flight request, removal of the service, idempotent disposal and no cache reuse after remount |
-| Public scope | MIT license, bilingual documentation and explicit package file list; no enterprise adapter, private credential bridge, personal configuration or demonstration fixture in the package |
+| 自动测试 | 26 项通过，覆盖余额接口白名单、十进制金额、多币种、缓存隔离、生命周期、用量聚合、分叉去重、缺价与缺用量、单价校验及配置冲突 |
+| 无凭据状态 | 实际安装包经真实 Loader 启动；余额 RPC 返回未登录，今日用量为已知空结果，单价配置为空 |
+| 用量与重算 | 合成会话事件进入宿主真实投影；6 次调用、13200 Token，保留 1 次缺用量提示。保存测试单价后按模型、会话与回合精确对账，分别为 CNY 0.03466 和 USD 0.0017，另有 1 次未定价调用 |
+| 配置边界 | 实际 `savePrice` RPC 写入隔离设置并立即重算；过期 revision 与非法单价均被拒绝 |
+| 重启保留 | 停止并重新启动隔离宿主后，已保存的单价仍存在，模型／会话／回合金额对账结果一致 |
+| 界面交互 | 中文概览、来源展开、按模型／会话及会话内模型明细通过；实际表单保存单价后费用更新，Escape 关闭并恢复钱包按钮焦点 |
+| 语言与窄屏 | 英文切换即时生效；390×844 Web 窄布局中面板宽 360，无页面横向溢出。README 截图来自实际运行的演示数据界面 |
+| 卸载与重装 | 官方 CLI 移除后包和 bundle 条目消失，RPC 返回 404，Chrome 中余额入口消失；重装后查询、金额对账及已保存单价恢复 |
+| 公开范围 | 明确的包文件清单、MIT、中英文说明；源码与测试不包含企业适配、Python 桥接、私人配置或凭据读取 |
 
-The README screenshot is a cropped capture of that running UI with **demonstration balances**, not real account data. The fixture and runtime observer are outside the released source and are never required by the plugin.
+合成事件只用于检查投影、计价和界面，没有发起真实模型调用。外部余额使用模拟响应；用量统计、单价保存和重算使用产品代码。
 
-## Host dependency resolution
+## 使用边界
 
-The three Harness APIs are `peerDependencies`, with exact development versions in the lockfile. They are supplied by the host at runtime, rather than installing a second Cordis or LLM runtime into the profile. The rc.5 profile installer may report unmet peer dependencies because its physical package tree does not contain these host APIs. Runtime identity was checked separately; this warning alone is not evidence that loading failed. Always check actual loading on the declared host version.
+- 本版未复验 DeepSeek API Key、OpenRouter 管理密钥或硅基流动的真实账户查询。模拟响应不证明真实账户权限或厂商可用性。
+- 隔离 Web 的结果不替代新的 Electron 桌面安装、Windows、Linux 或真实移动设备验收；日常桌面配置未用于本轮测试。
+- 金额是当前单价对当前宿主记录的估算，不是厂商账单，不包含工具费用或其他设备。日期和价格范围见插件说明。
+- 不声明兼容 0.2.1-rc.5 之外的宿主版本。
 
-## Limits
+## 复现
 
-- Live DeepSeek API-key, OpenRouter management-key and SiliconFlow account queries were **not** revalidated for this release. HTTP fixtures verify response handling, not live account permissions or provider availability.
-- This release was exercised in an isolated Harness **Web** instance on macOS. A new Electron desktop installation, Windows and Linux were not tested. The daily desktop profile was not modified.
-- Automatic minute-by-minute polling and cleanup on close are covered by code inspection; a full minute-by-minute network trace was not recorded during this release check.
-- Compatibility beyond Harness 0.2.1-rc.5 is not claimed.
+在插件目录使用声明的工具链执行 `pnpm install --frozen-lockfile --ignore-scripts` 和 `pnpm test`。从已提交源码打包，在新建 `DSH_HOME` 和独立 profile 中安装实际 `.tgz`，不复制真实凭据；无凭据、合成数据与真实账户分别记录验证范围。
 
-## Reproducing the checks
-
-Run `pnpm install --frozen-lockfile --ignore-scripts` and `pnpm test` with the repository's declared tools. Package from a clean committed source tree, then install the `.tgz` in a new `DSH_HOME` and profile. Do not copy existing credentials. Check signed-out behavior, then exercise providers with credentials you own if live verification is needed. Stop the instance before removal or reinstalling.
-
-Release attachments include the installable archive and `SHA256SUMS`; the Release tag identifies the corresponding source commit. Public-source installation and checksum read-back are recorded in the Release notes.
+Cordis、LLM 和 Typert API 由宿主提供。rc.5 的 profile 安装可能提示 peer dependency 缺失，需以真实加载与调用判断；不要仅为消除警告另装一套宿主运行时。Release 附带 `.tgz` 和 `SHA256SUMS`，tag 标识对应源码。
