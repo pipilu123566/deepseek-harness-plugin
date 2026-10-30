@@ -1,82 +1,45 @@
-# DSH Balance
+# deepseek-harness-plugin
 
-[中文](README.zh-CN.md) · [Releases](https://github.com/pipilu123566/dsh-balance/releases) · [Report a problem](https://github.com/pipilu123566/dsh-balance/issues)
+独立开发的 DeepSeek Harness 社区插件集合。每个插件在一个独立子目录中维护源码、依赖、测试和说明，并单独发布安装包。
 
-See the balances of your configured providers from the sidebar, without leaving DeepSeek Harness.
+**非官方社区项目，与 DeepSeek 无隶属关系，未获官方背书。**
 
-**Unofficial community plugin. Independently developed and maintained; not affiliated with or endorsed by DeepSeek.**
+## 插件
 
-![DSH Balance running in an isolated Harness profile with demonstration data](docs/images/balance-demo.jpg)
+| 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
+| --- | --- | --- | --- |
+| [DSH Balance](dsh-balance/README.zh-CN.md) | 在侧栏集中查看已配置厂商的账户余额 | [1.0.0 Release](https://github.com/pipilu123566/dsh-balance/releases/tag/v1.0.0) | DeepSeek Harness 0.2.1-rc.5 |
 
-The screenshot uses demonstration balances in a real, isolated Harness instance. It does not show a real account or prove a live provider query.
+余额插件已迁入 [`dsh-balance/`](dsh-balance/)，原公开提交历史保留。原仓库继续提供 1.0.0 下载、固定版本截图和验收记录；后续源码与问题反馈统一在本仓库维护。本次整理未新增或替换安装包。
 
-## What it does
+仓库根目录不是插件。安装时进入对应插件说明，下载该插件的 Release `.tgz`，不要把本仓库根地址直接交给插件安装命令。已发布版本的支持范围以其 README 和验收记录为准。
 
-- Hover or focus the wallet button to open balances; click to pin the panel.
-- View your DeepSeek signed-in account, DeepSeek API, OpenRouter and SiliconFlow configuration in one place.
-- Refresh on demand. While the panel is open, refresh once a minute; stop polling when it closes.
-- Keep currencies and wallet categories separate. No currency conversion or estimated token counts.
-- Show missing credentials, unsupported providers, rate limits and errors explicitly, never as a zero balance.
+## 目录与开发
 
-## Compatibility
-
-Version 1.0.0 targets **DeepSeek Harness 0.2.1-rc.5**. Later Harness versions are not claimed compatible. The sidebar uses the public footer slot, with a separate row above the account button.
-
-Release validation uses the actual package in an isolated Harness Web profile on macOS. See [validation](docs/validation.md) for the exact checks and limitations. Real DeepSeek API Key, OpenRouter and SiliconFlow credentials are not part of the automated tests.
-
-## Install
-
-1. Download [`pipilu123566-dsh-balance-1.0.0.tgz`](https://github.com/pipilu123566/dsh-balance/releases/download/v1.0.0/pipilu123566-dsh-balance-1.0.0.tgz) from the release. This is the installable package; GitHub's automatic source archives serve a different purpose.
-2. Fully quit Harness before changing its desktop profile. In the download directory, run:
-
-   ```sh
-   dsh plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
-   ```
-
-3. Reopen Harness. Look for the wallet button above the account area at the bottom of the sidebar. Configure your providers using Harness's normal settings.
-
-On macOS, if `dsh` is not on your PATH, use the CLI included with the application:
-
-```sh
-'/Applications/DeepSeek Harness.app/Contents/Resources/runtime/cli/bin/dsh' plugin --profile desktop add ./pipilu123566-dsh-balance-1.0.0.tgz --ignore-scripts
+```text
+deepseek-harness-plugin/
+├── README.md
+├── CONTRIBUTING.md
+├── LICENSE
+└── dsh-balance/
+    ├── package.json
+    ├── pnpm-lock.yaml
+    ├── README.md
+    ├── README.zh-CN.md
+    ├── LICENSE
+    └── 源码、测试与文档
 ```
 
-For an existing Web profile, replace `desktop` with its name and stop/restart that instance around package changes. Use only one balance bundle in a profile. To upgrade, install the new release package using the same procedure; do not widen the declared Harness compatibility range yourself.
+后续插件在根下新建独立目录；每个目录保留自己的版本、依赖、锁文件、测试与安装说明。开发和打包在目标插件目录内执行，不需要同时安装所有插件的依赖。详见[贡献与发布约定](CONTRIBUTING.md)。
 
-To uninstall, quit the target instance, run the following, and reopen it:
+问题反馈请在 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 中注明插件名称、版本和宿主版本。余额插件的[官方展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/11526)继续使用原帖。
 
-```sh
-dsh plugin --profile desktop remove @pipilu123566/dsh-balance
-```
+## English
 
-## Provider support
+A collection of independently developed community plugins for DeepSeek Harness. Each plugin lives in its own directory and has its own dependencies, version, documentation and installable release archive. This is an unofficial project, not affiliated with or endorsed by DeepSeek.
 
-| Provider | Source | Requirements and limits |
-| --- | --- | --- |
-| DeepSeek signed-in account | Harness account service | Sign in using Harness; topped-up and bonus wallets are shown separately |
-| DeepSeek API | Official `/user/balance` | A configured official API key; available, topped-up and granted balances |
-| OpenRouter | Official `/api/v1/credits` | A management key is required; ordinary keys may be denied; displays purchased credits minus usage |
-| SiliconFlow | Official `/v1/user/info` | A configured key for `api.siliconflow.cn`; balances are in CNY |
-| Other configured providers | No speculative requests | Shown as unsupported; unconfigured catalog entries are hidden |
-
-Official endpoints: [DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/), [OpenRouter](https://openrouter.ai/docs/api/api-reference/credits/get-remaining-credits), [SiliconFlow](https://github.com/siliconflow/siliconcloud/blob/main/openapi.yaml).
-
-Custom proxies, nonstandard ports, embedded URL credentials and redirected API requests are rejected. The plugin only sends each provider's credential to its matching allowlisted HTTPS endpoint. Keys stay on the host; the client receives a limited balance/status response. No analytics or separate backend is added by this plugin.
-
-## Development
-
-Use Node **22.21.1** and pnpm **10.33.2**, as declared in this repository. Runtime dependencies use the target Harness version.
-
-```sh
-pnpm install --frozen-lockfile --ignore-scripts
-pnpm test
-pnpm pack --out /path/to/output/dsh-balance.tgz
-```
-
-The bundle registers a Cordis host service, exposes a read-only Typert method and uses the `sidebar.footer.action` client slot. The client reuses Harness React, theme and locale services. Disposal clears timers, listeners, the popup, caches and in-flight network requests.
-
-Test an actual tarball in a new `DSH_HOME` with no copied account data before releasing. Development `link:` installs are not package validation. See [contributing](CONTRIBUTING.md) and [validation](docs/validation.md).
+[DSH Balance](dsh-balance/README.md) is the first plugin. Its source is now maintained here; the original repository continues to host the immutable 1.0.0 release. The repository root is not an installable plugin.
 
 ## License
 
-[MIT](LICENSE). Third-party dependencies retain their own licenses.
+自有代码采用 [MIT](LICENSE)。每个插件的安装包包含其许可证；第三方依赖保留各自许可。

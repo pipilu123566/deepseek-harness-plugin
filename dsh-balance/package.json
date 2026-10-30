@@ -61,11 +61,12 @@
   "author": "pipilu123566",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pipilu123566/dsh-balance.git"
+    "url": "git+https://github.com/pipilu123566/deepseek-harness-plugin.git",
+    "directory": "dsh-balance"
   },
-  "homepage": "https://github.com/pipilu123566/dsh-balance#readme",
+  "homepage": "https://github.com/pipilu123566/deepseek-harness-plugin/tree/main/dsh-balance#readme",
   "bugs": {
-    "url": "https://github.com/pipilu123566/dsh-balance/issues"
+    "url": "https://github.com/pipilu123566/deepseek-harness-plugin/issues"
   },
   "keywords": [
     "deepseek",
