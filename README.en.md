@@ -4,8 +4,6 @@
 
 A collection of independently developed community plugins for DeepSeek Harness. Each plugin has its own directory for source, dependencies, tests and documentation, and is released as a separate installable package.
 
-**Unofficial community project. Not affiliated with or endorsed by DeepSeek.**
-
 ## Development and maintenance
 
 These plugins grew out of my own needs and are primarily built for personal use. They have not undergone comprehensive compatibility testing across different environments. Please refer to each plugin's documentation for its verified scope.
