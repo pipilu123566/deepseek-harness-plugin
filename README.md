@@ -4,6 +4,14 @@
 
 **非官方社区项目，与 DeepSeek 无隶属关系，未获官方背书。**
 
+## 开发与维护说明
+
+这些插件都源于我自己的实际需求，首先服务于个人使用，并未进行全面的兼容性与适配测试。各插件已验证的范围以对应说明为准。
+
+欢迎通过 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 提出问题和建议。如果某项需求对我自己也有用，我会积极开发；其他需求大概率不会实现。也欢迎 Fork 到自己的仓库，按自己的需要继续开发和完善。
+
+我还是编程新手，这些插件全部通过 AI 开发完成。代码和设计如有不足，欢迎指正。
+
 ## 插件
 
 | 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
@@ -39,6 +47,14 @@ deepseek-harness-plugin/
 A collection of independently developed community plugins for DeepSeek Harness. Each plugin lives in its own directory and has its own dependencies, version, documentation and installable release archive. This is an unofficial project, not affiliated with or endorsed by DeepSeek.
 
 [DSH Balance](dsh-balance/README.md) is the first plugin. Its source is now maintained here; the original repository continues to host the immutable 1.0.0 release. The repository root is not an installable plugin.
+
+### Development and maintenance
+
+These plugins grew out of my own needs and are primarily built for personal use. They have not undergone comprehensive compatibility testing across different environments. Please refer to each plugin's documentation for its verified scope.
+
+Questions and suggestions are welcome in [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues). If a requested feature would also be useful to me, I will actively work on it; other requests are unlikely to be implemented. You are welcome to fork the repository and develop the features you need.
+
+I am a programming beginner, and all these plugins were developed using AI. Feedback on shortcomings in the code or design is welcome.
 
 ## License
 
