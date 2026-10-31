@@ -1,0 +1,83 @@
+{
+  "name": "@pipilu123566/dsh-documents",
+  "version": "0.3.0",
+  "description": "Local document library, fixed Inbox and manual references for DSH",
+  "type": "module",
+  "license": "MIT",
+  "author": "pipilu123566",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pipilu123566/deepseek-harness-plugin.git",
+    "directory": "dsh-documents"
+  },
+  "homepage": "https://github.com/pipilu123566/deepseek-harness-plugin/tree/main/dsh-documents#readme",
+  "bugs": {
+    "url": "https://github.com/pipilu123566/deepseek-harness-plugin/issues"
+  },
+  "keywords": ["dsh-plugin", "deepseek-harness", "documents", "markdown", "live-preview", "inbox"],
+  "engines": {
+    "node": ">=24",
+    "dsh": "0.2.1-rc.5"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "library.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "README.md",
+    "README.en.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "docs/",
+    "pnpm-lock.yaml",
+    ".node-version",
+    "client-source.js",
+    "live-preview.js",
+    "autosave.js"
+  ],
+  "scripts": {
+    "test": "node --test *.test.js",
+    "build": "esbuild client-source.js --bundle --format=iife --outfile=client.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-sidebar-right",
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.5"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.5",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.1-rc.5",
+    "esbuild": "0.25.12"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.11.1",
+    "@codemirror/lang-markdown": "^6.5.2",
+    "@codemirror/language": "^6.13.1",
+    "@codemirror/state": "^6.7.6",
+    "@codemirror/view": "^6.43.15",
+    "@lezer/highlight": "^1.2.5",
+    "dompurify": "3.4.17",
+    "highlight.js": "11.11.1",
+    "marked": "15.0.12"
+  }
+}

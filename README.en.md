@@ -17,6 +17,7 @@ I am a programming beginner, and all these plugins were developed using AI. Feed
 | Plugin | Purpose | Published version and installation | Compatible host |
 | --- | --- | --- | --- |
 | [DSH Balance](dsh-balance/README.en.md) | View balances, daily and session costs, and configure model prices | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
+| [DSH Documents](dsh-documents/README.en.md) | Browse local files, append to Inbox, live preview, autosave and quote into drafts | [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0) | DeepSeek Harness 0.2.1-rc.5 |
 
 See each plugin's documentation for its features, installation steps and support scope.
 
@@ -30,7 +31,8 @@ deepseek-harness-plugin/
 ├── README.en.md
 ├── CONTRIBUTING.md
 ├── LICENSE
-└── dsh-balance/
+├── dsh-balance/
+└── dsh-documents/
     ├── package.json
     ├── pnpm-lock.yaml
     ├── README.md
