@@ -22,11 +22,14 @@ I am a programming beginner, and all these plugins were developed using AI. Feed
 
 See each plugin's documentation for its features, installation steps and support scope.
 
-### DSH Documents walkthrough
+### See the workflows
 
-Browse local documents, append to Inbox with autosave, then quote a passage into the current conversation. This 0.3.0 feature prototype uses demo data; [see the complete animation and static steps](dsh-documents/README.en.md#see-the-workflow).
+These versioned feature prototypes use demo data. Select a preview for the complete animation, static steps and support scope on the plugin’s home page.
 
-[![DSH Documents feature prototype: select a passage in the conversation sidebar and quote it into the composer](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow)
+| Balance · 1.1.0 | Remote Desktop · 0.3.6 preview | Documents · 0.3.0 |
+| --- | --- | --- |
+| [![Balance feature prototype](dsh-balance/media/balance-1.1.0-overview.en.png)](dsh-balance/README.en.md#see-the-workflow) | [![Remote Desktop feature prototype](dsh-remote-desktop/media/remote-0.3.6-input.en.png)](dsh-remote-desktop/README.en.md#see-the-workflow) | [![Documents feature prototype](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow) |
+| Inspect balances, set model prices and review session cost estimates | Connect to a Mac, zoom and pan, type and disconnect | Find documents, append to Inbox and quote into a conversation |
 
 The repository root is not a plugin. Follow the selected plugin's documentation and download its Release `.tgz`; do not pass the collection's root URL directly to the plugin installer. Support claims are defined by each published version's README and validation record.
 

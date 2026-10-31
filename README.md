@@ -22,11 +22,14 @@
 
 各插件的功能、安装步骤和支持范围见对应目录的说明。
 
-### DSH 文档库使用演示
+### 使用演示
 
-浏览本地文档、追加 Inbox 自动保存，再把选段加入当前会话。以下为 0.3.0 功能原型，使用演示数据；[查看完整动图与静态分步图](dsh-documents/README.md#使用演示)。
+以下为对应版本的功能原型，使用演示数据。点击预览进入插件首页，查看完整动图、静态分步和支持范围。
 
-[![DSH 文档库功能原型：在会话侧栏选中文档内容并引用到输入框](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示)
+| 余额与消耗 · 1.1.0 | 远程桌面 · 0.3.6 预览版 | 文档库 · 0.3.0 |
+| --- | --- | --- |
+| [![余额与消耗功能原型](dsh-balance/media/balance-1.1.0-overview.zh.png)](dsh-balance/README.md#使用演示) | [![远程桌面功能原型](dsh-remote-desktop/media/remote-0.3.6-input.zh.png)](dsh-remote-desktop/README.md#使用演示) | [![文档库功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示) |
+| 看余额、设置单价、按会话查看费用估算 | 手机连接 Mac、缩放定位、文字输入与断开 | 找文档、追加 Inbox、引用到会话 |
 
 仓库根目录不是插件。安装时进入对应插件说明，下载该插件的 Release `.tgz`，不要把本仓库根地址直接交给插件安装命令。已发布版本的支持范围以其 README 和验收记录为准。
 

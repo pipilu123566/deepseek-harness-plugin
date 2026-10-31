@@ -6,11 +6,15 @@ View and control a Mac from a mobile browser, with mouse and keyboard input, tex
 
 **Public preview 0.3.6**, compatible with DeepSeek Harness **0.2.1-rc.5**. The computer side supports **Apple Silicon Macs running macOS 13 or later** only. The remote page and Mac permission window currently use Chinese primarily.
 
-## Interface preview
+## See the workflow
 
-![Mobile zoom demonstration](docs/mobile-zoom-demo.png)
+Prepare permissions on the Mac → open your personal login link on the phone → zoom and pan to the target → select a field and send text, then disconnect when finished.
 
-This screenshot uses version 0.3.3's synthetic test pattern and browser mobile emulation. Input does not operate the Mac. It is not a real desktop or real iPad acceptance screenshot. Version 0.3.6 retains this remote UI.
+![DSH Remote Desktop 0.3.6 feature prototype: prepare the Mac, connect a phone, zoom to a target, send text and disconnect](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-remote-desktop/media/remote-0.3.6-workflow.en.gif)
+
+An approximately 14-second feature prototype based on public preview 0.3.6, using a synthetic desktop and demo data. English captions explain the workflow; controls retain this version’s Chinese UI. This is not a phone recording or proof of lock-screen unlock or real iPad acceptance. No real login link or QR code is generated. Static steps: [Preparation](media/remote-0.3.6-setup.en.png) · [Zoom and pan](media/remote-0.3.6-zoom.en.png) · [Text input](media/remote-0.3.6-input.en.png).
+
+The [0.3.3 browser mobile-emulation screenshot](docs/mobile-zoom-demo.png) remains available. It uses a synthetic test pattern and does not operate the Mac; 0.3.6 retains that remote UI. The phone still needs a reachable DSH HTTPS endpoint. The plugin does not provision public internet access.
 
 ## Installation
 

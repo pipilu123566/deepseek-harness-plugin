@@ -6,11 +6,15 @@
 
 **0.3.6 公开预览版**，兼容 DeepSeek Harness **0.2.1-rc.5**。电脑端仅支持 **Apple Silicon Mac、macOS 13 及以上**。目前网页和 Mac 权限窗口主要使用中文。
 
-## 界面演示
+## 使用演示
 
-![手机缩放演示](docs/mobile-zoom-demo.png)
+Mac 授权与准备 → 手机打开本人访问链接 → 缩放、平移定位 → 点选输入框发送文字，结束后断开。
 
-演示使用 0.3.3 的合成测试画面和浏览器手机尺寸模拟，输入不会操作 Mac；不是实际用户桌面或真实 iPad 验收截图。0.3.6 沿用同一远控界面。
+![DSH 远程桌面 0.3.6 功能原型：Mac 权限准备、手机连接、缩放定位、文字输入与断开连接](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-remote-desktop/media/remote-0.3.6-workflow.zh.gif)
+
+约 14 秒功能原型，依据 0.3.6 公开预览版绘制，使用合成桌面和演示数据；不是实际手机录屏，也不证明锁屏解锁或真实 iPad 已通过验收。演示不生成真实登录链接或二维码。静态分步图：[连接准备](media/remote-0.3.6-setup.zh.png) · [缩放定位](media/remote-0.3.6-zoom.zh.png) · [文字输入](media/remote-0.3.6-input.zh.png)。
+
+另有 [0.3.3 浏览器手机尺寸测试截图](docs/mobile-zoom-demo.png)，使用合成画面，输入不会操作 Mac；0.3.6 沿用同一远控界面。手机仍需能访问运行插件的 DSH HTTPS 入口，插件不会自动开通公网服务。
 
 ## 安装
 

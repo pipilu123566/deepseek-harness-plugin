@@ -6,9 +6,13 @@ View account balances, today's model costs and session spending from the DeepSee
 
 [Download 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [Report a problem](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
 
-![Balances and daily spending using demonstration data](docs/images/balance-1.1.0-demo.png)
+## See the workflow
 
-The screenshot uses demonstration data and contains no real account information.
+Open the sidebar wallet → inspect balances and daily spending → save model prices and recalculate → review costs by session.
+
+![DSH Balance 1.1.0 feature prototype: open the overview, save model prices and recalculate, then inspect session costs](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-balance/media/balance-1.1.0-workflow.en.gif)
+
+An approximately 14-second loop illustrating 1.1.0 features, not a screen recording. Amounts, models and prices are demo data, not real balances, official rates or invoices. Static steps: [Overview](media/balance-1.1.0-overview.en.png) · [Model prices](media/balance-1.1.0-prices.en.png) · [Session spending](media/balance-1.1.0-sessions.en.png). An [actual runtime screenshot using demo data](docs/images/balance-1.1.0-demo.png) is also available.
 
 ## Features
 

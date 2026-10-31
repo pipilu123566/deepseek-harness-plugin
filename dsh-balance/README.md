@@ -6,9 +6,13 @@
 
 [下载 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [问题反馈](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
 
-![余额与今日消耗，使用演示数据](docs/images/balance-1.1.0-demo.png)
+## 使用演示
 
-截图使用演示数据，不含真实账户信息。
+打开侧栏钱包 → 查看余额和今日消耗 → 配置模型单价并重算 → 按会话定位花费。
+
+![DSH Balance 1.1.0 功能原型：打开余额概览、保存模型单价并重算费用、按会话查看消耗](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-balance/media/balance-1.1.0-workflow.zh.gif)
+
+约 14 秒循环，依据 1.1.0 功能绘制，属于功能原型而非操作实录。金额、模型和单价均为演示数据，不代表真实账户、官方报价或账单实扣。静态分步图：[余额概览](media/balance-1.1.0-overview.zh.png) · [配置单价](media/balance-1.1.0-prices.zh.png) · [会话消耗](media/balance-1.1.0-sessions.zh.png)；另有[实际运行的演示数据截图](docs/images/balance-1.1.0-demo.png)。
 
 ## 功能
 
