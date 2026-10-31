@@ -22,6 +22,12 @@ I am a programming beginner, and all these plugins were developed using AI. Feed
 
 See each plugin's documentation for its features, installation steps and support scope.
 
+### DSH Documents walkthrough
+
+Browse local documents, append to Inbox with autosave, then quote a passage into the current conversation. This 0.3.0 feature prototype uses demo data; [see the complete animation and static steps](dsh-documents/README.en.md#see-the-workflow).
+
+[![DSH Documents feature prototype: select a passage in the conversation sidebar and quote it into the composer](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow)
+
 The repository root is not a plugin. Follow the selected plugin's documentation and download its Release `.tgz`; do not pass the collection's root URL directly to the plugin installer. Support claims are defined by each published version's README and validation record.
 
 ## Structure and development

@@ -6,6 +6,14 @@
 
 非官方社区插件。文档目录可以是 Obsidian 库，也可以是任意普通文件夹；无需安装 Obsidian 插件。
 
+## 使用演示
+
+找材料 → 随手追加 Inbox 并自动保存 → 把选段引用到会话输入框，确认后再发送。
+
+![DSH 文档库 0.3.0 功能原型：浏览本地文档、追加 Inbox 自动保存、引用选段到会话输入框](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-documents/media/documents-0.3.0-workflow.zh.gif)
+
+约 14 秒循环演示，按已发布的 0.3.0 功能绘制，使用演示数据，属于功能原型而非桌面操作实录。静态分步图：[浏览文档](media/documents-0.3.0-browse.zh.png) · [Inbox 自动保存](media/documents-0.3.0-inbox.zh.png) · [引用到会话](media/documents-0.3.0-quote.zh.png)。
+
 ## 安装与配置
 
 从 [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0) 下载 [独立安装包](https://github.com/pipilu123566/deepseek-harness-plugin/releases/download/%40pipilu123566%2Fdsh-documents%400.3.0/pipilu123566-dsh-documents-0.3.0.tgz) 和 `SHA256SUMS`。在 DSH「插件」页安装 `.tgz`；独立 Web profile 也可运行：

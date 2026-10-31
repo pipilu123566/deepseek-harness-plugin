@@ -6,6 +6,14 @@ Browse a local document library in DeepSeek Harness, append notes to a fixed Inb
 
 An unofficial community plugin. The library can be an Obsidian vault or any ordinary folder; no Obsidian plugin is required.
 
+## See the workflow
+
+Find material → append to your Inbox with autosave → quote a passage into the conversation draft, then send when ready.
+
+![DSH Documents 0.3.0 feature prototype: browse local documents, append to Inbox with autosave, and quote a selection into a conversation draft](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-documents/media/documents-0.3.0-workflow.en.gif)
+
+An approximately 14-second loop illustrating released 0.3.0 features with demo data. This is a feature prototype, not a screen recording. Static steps: [Browse documents](media/documents-0.3.0-browse.en.png) · [Inbox autosave](media/documents-0.3.0-inbox.en.png) · [Quote into a draft](media/documents-0.3.0-quote.en.png).
+
 ## Install and configure
 
 Download the [standalone package](https://github.com/pipilu123566/deepseek-harness-plugin/releases/download/%40pipilu123566%2Fdsh-documents%400.3.0/pipilu123566-dsh-documents-0.3.0.tgz) and `SHA256SUMS` from the [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0). Install the `.tgz` through DSH’s Plugins page. For a standalone Web profile:
