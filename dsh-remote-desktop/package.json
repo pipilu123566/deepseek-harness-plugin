@@ -1,0 +1,79 @@
+{
+  "name": "@pipilu/dsh-remote-desktop",
+  "version": "0.3.6",
+  "private": true,
+  "description": "Native WebRTC remote desktop for DeepSeek Harness",
+  "type": "module",
+  "engines": {
+    "node": ">=22",
+    "dsh": "0.2.1-rc.5"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "controller.js",
+    "server.js",
+    "native-bridge.js",
+    "prepare-agent.js",
+    "client.js",
+    "dist",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "agent/DeepSeekRemoteAgent.zip",
+    "agent/manifest.json",
+    "third-party",
+    "deploy",
+    "README.en.md",
+    "LICENSE",
+    "docs"
+  ],
+  "scripts": {
+    "build": "node build.js",
+    "build:agent": "node native/build-agent.js",
+    "test": "node --test test/*.test.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "dependencies": {
+    "ws": "8.22.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "qrcode": "1.5.4"
+  },
+  "license": "MIT",
+  "author": "pipilu123566",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pipilu123566/deepseek-harness-plugin.git",
+    "directory": "dsh-remote-desktop"
+  },
+  "homepage": "https://github.com/pipilu123566/deepseek-harness-plugin/tree/main/dsh-remote-desktop#readme",
+  "bugs": {
+    "url": "https://github.com/pipilu123566/deepseek-harness-plugin/issues"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "remote-desktop",
+    "webrtc",
+    "macos",
+    "mobile"
+  ]
+}

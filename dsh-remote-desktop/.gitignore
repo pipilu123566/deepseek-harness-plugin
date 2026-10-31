@@ -1,0 +1,6 @@
+node_modules/
+native/.build/
+native/Vendor/
+agent/*.app/
+*.tgz
+.DS_Store

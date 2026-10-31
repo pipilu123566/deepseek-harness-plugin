@@ -1,0 +1,7 @@
+# Replace placeholders with a dedicated tunnel and your own hostname.
+tunnel: TUNNEL_UUID
+credentials-file: /absolute/path/to/TUNNEL_UUID.json
+ingress:
+  - hostname: remote.example.com
+    service: http://127.0.0.1:18325
+  - service: http_status:404

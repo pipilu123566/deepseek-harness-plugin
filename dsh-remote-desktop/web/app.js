@@ -1,0 +1,182 @@
+import QRCode from 'qrcode';
+import {fitView,zoomView,panView,resizeView,remotePoint,MAX_ZOOM} from './view.js';
+const $=id=>document.getElementById(id);
+const video=$('desktop-video'),screen=$('screen'),base=new URL('./',location.href);
+$('back-link').href=new URL('../',base).href;
+let state,ws,pc,channel,config,nativeReady=false,offered=false,active=false,pending=false,generation=0,polling=false,statusUnavailable=false,sequence=0,testPattern=false,handshakeTimer,entry,entryTimer,entryGeneration=0,draftTimer,pan=false;
+let pointers=new Map(),gesture=null,view=null;
+const messages={
+ 'permissions-required':'请在 Mac 上打开「DeepSeek 远程桌面权限」，授权屏幕录制和辅助功能后重试。',
+ 'agent-unavailable':'Mac 原生助手尚未就绪，请检查安装后重试。',
+ 'agent-timeout':'Mac 助手启动超时，请检查权限后重新连接。',
+ 'capture-failed':'Mac 画面采集暂不可用，请重新连接；持续失败时再检查屏幕状态与录屏权限。',
+ 'display-wake-failed':'无法唤醒 Mac 显示器，请稍后重新连接。',
+ 'capture-stopped':'Mac 已停止屏幕共享，请重新连接。',
+ 'negotiation-failed':'桌面连接协商失败，请重新连接。',
+ 'desktop-in-use':'桌面正在使用中，请在原页面断开后重试。',
+ 'connection-owner-required':'请在原页面结束正在使用的连接。',
+};
+function notice(text=''){ $('notice').textContent=text;$('notice').hidden=!text; }
+function clearDraft(){ $('typing-input').value='';clearTimeout(draftTimer); }
+function clearEntry(){entryGeneration++;entry=null;clearTimeout(entryTimer);$('copy-mobile-link').hidden=true;$('prepare-mobile-link').hidden=false;const canvas=$('mobile-qr');canvas.hidden=true;canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);}
+function render(){
+ const ready=state?.native?.installed&&state.native.screen&&state.native.input;
+ const busy=state?.phase!=='idle'&&state?.phase!==undefined&&!ws;
+ $('machine-name').textContent=state?.machineName||'这台 Mac';
+ $('status-label').textContent=active?'已连接':ws?'正在连接':pending?'正在处理':busy?'桌面正在使用中':!state?'正在检查':!ready?'电脑尚未就绪':'可以连接';
+ $('status-pill').dataset.tone=active||ready&&!busy?'good':'neutral';
+ $('connect').hidden=!!ws;$('connect').disabled=pending||!ready||busy;
+ $('setup').hidden=!state?.native?.installed||!!ready||!!ws;$('setup').disabled=pending;
+ $('disconnect').hidden=!ws&&!(state?.owned&&state?.phase!=='idle');$('disconnect').disabled=pending;
+ $('empty-state').hidden=active;$('live-dot').dataset.live=String(active);
+ $('viewer-label').textContent=active?(testPattern?'测试画面 · 输入不会操作 Mac':'实时桌面'):'电脑画面';
+ if(!active)$('connection-detail').textContent=ws?'正在连接':'未连接';
+ $('empty-title').textContent=ws?'正在连接桌面':busy?'桌面正在使用中':!ready?'Mac 助手需要授权':'连接你的 Mac';
+ $('empty-description').textContent=ws?'正在建立画面和操作通道。':busy?'请在原页面断开后再连接。':!ready?'在 Mac 授权屏幕录制和辅助功能后，刷新状态。':'点击「连接这台 Mac」，即可查看和操作当前桌面。';
+ for(const b of document.querySelectorAll('[data-key]'))b.disabled=!active;
+ for(const id of ['typing-mode','typing-input','send-text','view-mode','pan','zoom-reset'])$(id).disabled=!active;
+ renderView();
+}
+async function api(path,body){
+ const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),10000);
+ try{const r=await fetch(new URL('api/'+path,base),{method:body===undefined?'GET':'POST',credentials:'same-origin',cache:'no-store',headers:body===undefined?{}:{'Content-Type':'application/json','X-Remote-Desktop':'1'},body:body===undefined?undefined:JSON.stringify(body),signal:abort.signal});
+  const value=await r.json();if(!r.ok)throw Object.assign(new Error('request-failed'),{code:value.error,status:r.status});return value;
+ }finally{clearTimeout(timer);}
+}
+function errorText(e){return messages[e.code]||(e.status===401||e.status===403?'请返回 DeepSeek 重新登录。':'连接暂不可用，请检查电脑和网络后重试。');}
+function send(m){if(!active||channel?.readyState!=='open'||channel.bufferedAmount>65536)return false;channel.send(JSON.stringify({...m,id:++sequence}));return true;}
+function cleanup(){
+ generation++;clearTimeout(handshakeTimer);active=false;nativeReady=false;offered=false;config=null;
+ if(channel?.readyState==='open')channel.send(JSON.stringify({type:'release'}));
+ channel?.close();channel=null;pc?.close();pc=null;const old=ws;ws=null;old?.close();
+ video.srcObject=null;view=null;gesture=null;clearDraft();pointers.clear();render();
+}
+async function disconnect(){
+ cleanup();pending=true;render();
+ try{state=await api('disconnect',{});notice();}catch(e){notice(errorText(e));}finally{pending=false;render();}
+}
+async function refresh(){
+ if(pending||polling)return;polling=true;
+ try{state=await api('status');if(statusUnavailable){statusUnavailable=false;notice();}if(ws&&(!state.owned||state.phase==='idle')){cleanup();notice('连接已结束，可重新连接。');}render();}
+ catch(e){if(e.status===401||e.status===403){if(ws)cleanup();notice(errorText(e));}else{statusUnavailable=true;notice(ws?'暂时无法更新连接状态，正在重试。':errorText(e));}}finally{polling=false;}
+}
+function failed(code){cleanup();notice(messages[code]||'连接已断开，请重新连接。');refresh();}
+async function negotiate(){
+ if(!config||!nativeReady||offered||!ws)return;offered=true;
+ const current=generation;
+ try{
+  const peer=new RTCPeerConnection({iceServers:config.iceServers,iceTransportPolicy:config.relayOnly?'relay':'all'});pc=peer;
+  const tr=peer.addTransceiver('video',{direction:'recvonly'});
+  const codecs=RTCRtpReceiver.getCapabilities?.('video')?.codecs;
+  if(codecs&&tr.setCodecPreferences)tr.setCodecPreferences([...codecs.filter(c=>c.mimeType==='video/H264'),...codecs.filter(c=>c.mimeType!=='video/H264')]);
+  const dc=peer.createDataChannel('input',{ordered:true});channel=dc;
+  function checkConnected(){if(current!==generation)return;active=dc.readyState==='open'&&['connected','completed'].includes(peer.iceConnectionState)&&video.readyState>=2;if(active){clearTimeout(handshakeTimer);notice();video.play().catch(()=>{});$('connection-detail').textContent=testPattern?'测试画面已连接':'桌面已连接';}render();}
+  dc.onopen=checkConnected;video.onloadeddata=checkConnected;
+  dc.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch{return;}if(m.type==='ack'){$('input-note').textContent=m.ok?(testPattern?'测试输入已确认，未操作 Mac。':'已输入到电脑。'):'输入未执行，请确认 Mac 辅助功能权限。';$('input-note').dataset.ack=String(m.id);}};
+  dc.onclose=()=>{if(current===generation)failed();};
+  peer.onicecandidate=e=>{if(current===generation&&e.candidate&&ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'candidate',candidate:e.candidate.candidate,sdpMid:e.candidate.sdpMid,sdpMLineIndex:e.candidate.sdpMLineIndex}));};
+  peer.ontrack=e=>{if(current!==generation)return;video.srcObject=e.streams[0]||new MediaStream([e.track]);video.play().catch(()=>{});};
+  peer.oniceconnectionstatechange=()=>{if(current!==generation)return;checkConnected();if(peer.iceConnectionState==='failed')failed();};
+  const offer=await peer.createOffer();await peer.setLocalDescription(offer);
+  if(current===generation&&ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'offer',sdp:offer.sdp}));
+ }catch{if(current===generation)failed('negotiation-failed');}
+}
+async function connect(){
+ if(pending||ws)return;pending=true;notice();render();
+ try{
+  state=await api('connect',{});const current=++generation;nativeReady=false;config=null;offered=false;
+  const url=new URL('socket',base);url.protocol=url.protocol==='https:'?'wss:':'ws:';
+  const socket=new WebSocket(url);ws=socket;
+  socket.onmessage=async e=>{
+   if(current!==generation)return;
+   let m;try{m=JSON.parse(e.data);}catch{return failed();}
+   if(m.type==='configuration'){config=m;testPattern=m.testPattern===true;negotiate();}
+   else if(m.type==='ready'){nativeReady=true;negotiate();}
+   else if(m.type==='answer'){try{await pc?.setRemoteDescription({type:'answer',sdp:m.sdp});for(const c of candidates)await pc?.addIceCandidate(c);candidates=[];}catch{failed('negotiation-failed');}}
+   else if(m.type==='candidate'){const c={candidate:m.candidate,sdpMid:m.sdpMid,sdpMLineIndex:m.sdpMLineIndex};if(pc?.remoteDescription)pc.addIceCandidate(c).catch(()=>failed('negotiation-failed'));else candidates.push(c);}
+   else if(m.type==='error')failed(m.code);
+   else if(m.type==='closed')failed();
+  };
+  let candidates=[];
+  socket.onclose=()=>{if(current===generation)failed();};socket.onerror=()=>{if(current===generation)failed();};
+  handshakeTimer=setTimeout(()=>{if(current===generation)failed('negotiation-failed');},30000);
+ }catch(e){notice(errorText(e));}finally{pending=false;render();}
+}
+const mods=e=>({meta:e.metaKey,ctrl:e.ctrlKey,shift:e.shiftKey,alt:e.altKey});
+function local(e){const r=screen.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
+function point(e){return view?remotePoint(view,local(e)):{x:0,y:0};}
+function renderView(){
+ if(view){video.style.width=view.baseWidth+'px';video.style.height=view.baseHeight+'px';video.style.transform=`translate(${view.x}px,${view.y}px) scale(${view.zoom})`;}
+ const zoom=view?.zoom||1;$('zoom-value').textContent=Math.round(zoom*100)+'%';
+ $('zoom-out').disabled=!active||zoom<=1.001;$('zoom-in').disabled=!active||zoom>=MAX_ZOOM;
+ if(view){const actual=video.videoWidth/view.baseWidth;$('view-mode').value=Math.abs(zoom-1)<.001?'fit':Math.abs(zoom-actual)<.001?'actual':'custom';}
+}
+function layoutView(reset=false){
+ const r=screen.getBoundingClientRect();if(!video.videoWidth||!r.width||!r.height)return;
+ view=!view||reset?fitView(r.width,r.height,video.videoWidth,video.videoHeight):resizeView(view,r.width,r.height,video.videoWidth,video.videoHeight);renderView();
+}
+function changeZoom(zoom,anchor){if(!view)return;view=zoomView(view,zoom,anchor);renderView();}
+function moveView(dx,dy){if(!view)return;view=panView(view,dx,dy);renderView();}
+function pointer(action,e){send({type:'pointer',action,button:e.button===2?2:0,...point(e),...mods(e)});}
+function touches(){return [...pointers.values()].filter(p=>p.touch);}
+function pair(){const [a,b]=touches();return{center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance:Math.hypot(a.x-b.x,a.y-b.y)};}
+video.addEventListener('loadedmetadata',()=>layoutView(true));
+new ResizeObserver(()=>layoutView()).observe(screen);
+video.addEventListener('pointerdown',e=>{
+ if(!active)return;e.preventDefault();video.focus();video.setPointerCapture(e.pointerId);
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,startX:e.clientX,startY:e.clientY,touch:e.pointerType==='touch',down:false});
+ if(e.pointerType==='touch'){
+  if(touches().length===2&&view){const p=pair();gesture={...p,previous:p.center,view:{...view},mode:'pending'};send({type:'release'});}
+  return;
+ }
+ if(!pan){pointer('down',e);pointers.get(e.pointerId).down=true;}
+});
+video.addEventListener('pointermove',e=>{
+ if(!active)return;e.preventDefault();const p=pointers.get(e.pointerId),old=p&&{x:p.x,y:p.y};if(p){p.x=e.clientX;p.y=e.clientY;}
+ if(e.pointerType==='touch'){
+  if(gesture){
+   if(touches().length<2)return;
+   const next=pair(),ratio=next.distance/Math.max(1,gesture.distance);
+   if(Math.abs(ratio-1)>.035)gesture.mode='zoom';
+   else if(gesture.mode==='pending'&&Math.hypot(next.center.x-gesture.center.x,next.center.y-gesture.center.y)>6)gesture.mode=(gesture.view.zoom>1.01||pan)?'pan':'scroll';
+   if(gesture.mode==='zoom'){
+    const r=screen.getBoundingClientRect();view=zoomView(gesture.view,gesture.view.zoom*ratio,{x:gesture.center.x-r.left,y:gesture.center.y-r.top},{x:next.center.x-r.left,y:next.center.y-r.top});renderView();
+   }else if(gesture.mode==='pan'){view=panView(gesture.view,next.center.x-gesture.center.x,next.center.y-gesture.center.y);renderView();}
+   else if(gesture.mode==='scroll')send({type:'wheel',dx:gesture.previous.x-next.center.x,dy:gesture.previous.y-next.center.y});
+   gesture.previous=next.center;return;
+  }
+  if(!p)return;
+  if(pan){moveView(e.clientX-old.x,e.clientY-old.y);return;}
+  if(!p.down&&Math.hypot(e.clientX-p.startX,e.clientY-p.startY)>6){pointer('down',{...e,clientX:p.startX,clientY:p.startY});p.down=true;}
+  if(p.down)pointer('move',e);return;
+ }
+ if(pan){if(old)moveView(e.clientX-old.x,e.clientY-old.y);}else pointer('move',e);
+});
+for(const kind of ['pointerup','pointercancel'])video.addEventListener(kind,e=>{
+ if(!active)return;e.preventDefault();const p=pointers.get(e.pointerId);pointers.delete(e.pointerId);
+ if(gesture){if(!touches().length)gesture=null;return;}
+ if(kind==='pointercancel'){send({type:'release'});return;}
+ if(!pan&&p){if(p.touch&&!p.down)pointer('down',e);pointer('up',e);}
+});
+video.addEventListener('contextmenu',e=>e.preventDefault());
+video.addEventListener('wheel',e=>{if(!active)return;e.preventDefault();if(e.ctrlKey)changeZoom((view?.zoom||1)*Math.exp(-e.deltaY/250),local(e));else if(pan)moveView(-e.deltaX,-e.deltaY);else send({type:'wheel',dx:e.deltaX,dy:e.deltaY});},{passive:false});
+for(const kind of ['keydown','keyup'])video.addEventListener(kind,e=>{if(!active)return;e.preventDefault();send({type:'key',code:e.code,down:kind==='keydown',...mods(e)});});
+video.addEventListener('blur',()=>{send({type:'release'});pointers.clear();gesture=null;});
+const shortcuts={escape:['Escape'],tab:['Tab'],enter:['Enter'],backspace:['Backspace'],selectAll:['KeyA',true],copy:['KeyC',true],paste:['KeyV',true],left:['ArrowLeft'],right:['ArrowRight'],up:['ArrowUp'],down:['ArrowDown']};
+for(const b of document.querySelectorAll('[data-key]'))b.addEventListener('click',()=>{const [code,meta=false]=shortcuts[b.dataset.key];send({type:'shortcut',code,meta});});
+$('typing-mode').addEventListener('change',()=>{clearDraft();$('typing-input').type=$('typing-mode').value==='text'?'text':'password';});
+$('typing-input').addEventListener('input',()=>{clearTimeout(draftTimer);draftTimer=setTimeout(clearDraft,60000);});
+$('typing-form').addEventListener('submit',e=>{e.preventDefault();const input=$('typing-input'),text=input.value;if(text&&send({type:'text',text}))clearDraft();});
+$('connect').addEventListener('click',connect);$('disconnect').addEventListener('click',disconnect);$('refresh').addEventListener('click',refresh);
+$('setup').addEventListener('click',async()=>{try{await api('setup',{});notice('权限窗口已在 Mac 打开，请在电脑上完成授权后刷新状态。');}catch(e){notice(errorText(e));}});
+$('view-mode').addEventListener('change',()=>changeZoom($('view-mode').value==='actual'&&view?video.videoWidth/view.baseWidth:1));
+$('zoom-in').addEventListener('click',()=>changeZoom((view?.zoom||1)*1.25));
+$('zoom-out').addEventListener('click',()=>changeZoom((view?.zoom||1)/1.25));
+$('zoom-reset').addEventListener('click',()=>changeZoom(1));
+$('pan').addEventListener('click',()=>{pan=!pan;screen.dataset.pan=String(pan);$('pan').setAttribute('aria-pressed',String(pan));});
+if($('workbench').requestFullscreen){$('fullscreen').hidden=false;$('fullscreen').addEventListener('click',()=>document.fullscreenElement?document.exitFullscreen():$('workbench').requestFullscreen());}
+$('prepare-mobile-link').addEventListener('click',async()=>{const gen=++entryGeneration;$('prepare-mobile-link').disabled=true;try{const value=await api('entry');if(gen!==entryGeneration||document.hidden)return;const url=new URL(value.url);if(url.origin!==base.origin||url.pathname!==new URL('login',base).pathname||url.username||url.password)throw Error();entry=url.href;await QRCode.toCanvas($('mobile-qr'),entry,{width:240,margin:2});if(gen!==entryGeneration||document.hidden){clearEntry();return;}$('mobile-qr').hidden=false;$('prepare-mobile-link').hidden=true;$('copy-mobile-link').hidden=false;$('mobile-link-status').textContent='用本人手机或 iPad 扫码登录，也可以复制链接。二维码在本页显示 60 秒。';entryTimer=setTimeout(clearEntry,60000);}catch{notice('暂时无法准备手机访问链接。');}finally{$('prepare-mobile-link').disabled=false;}});
+$('copy-mobile-link').addEventListener('click',async()=>{if(!entry)return;try{await navigator.clipboard.writeText(entry);clearEntry();$('mobile-link-status').textContent='已复制，请在自己的手机或 iPad 打开。';}catch{notice('复制失败，请重试。');}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearDraft();clearEntry();send({type:'release'});}});
+window.addEventListener('pagehide',cleanup);
+refresh();setInterval(refresh,5000);

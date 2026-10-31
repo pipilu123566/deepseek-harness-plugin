@@ -17,6 +17,7 @@
 | 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
 | --- | --- | --- | --- |
 | [DSH Balance](dsh-balance/README.md) | 查看账户余额、今日及会话消耗，配置模型单价 | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
+| [DSH 远程桌面](dsh-remote-desktop/README.md) | 手机浏览器远控 Mac、键鼠输入、双指缩放和平移 | [0.3.6 预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.3.6) | DeepSeek Harness 0.2.1-rc.5 |
 
 各插件的功能、安装步骤和支持范围见对应目录的说明。
 
