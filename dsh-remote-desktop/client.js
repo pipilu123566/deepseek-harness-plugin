@@ -2,6 +2,8 @@ window.__ModuleLoader__.load({
   id: '@pipilu/dsh-remote-desktop',
   factory(require) {
     const React = require('react'), h = React.createElement;
+    // One-time migration lets already-open pages recover from the old orphaned dictionary.
+    const NS = 'pipilu.remote.desktop';
     const icon = () => h('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, 'aria-hidden': true },
       h('rect', { x: 3, y: 4, width: 18, height: 13, rx: 2.5 }), h('path', { d: 'M8 21h8M12 17v4M3 13h18' }));
     const css = '.prd-entry{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:44px;min-width:44px;box-sizing:border-box;padding:0 10px;border:0;border-radius:9px;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:12px;text-decoration:none;white-space:nowrap;cursor:pointer}.prd-entry:hover{background:var(--dsw-alias-interactive-bg-hover);color:var(--dsw-alias-label-primary)}.prd-entry:focus-visible{outline:2px solid var(--dsw-alias-state-business-primary);outline-offset:2px}.prd-entry:disabled{opacity:.6;cursor:wait}.prd-entry svg{flex:none}.prd-sidebar-entry{width:100%;justify-content:flex-start}.prd-sidebar-entry[data-wide=false]{width:44px;padding:0;justify-content:center}.prd-entry-status{display:block;max-width:260px;padding:4px 10px;font-size:11px;line-height:1.6;color:var(--dsw-alias-label-secondary)}';
@@ -54,12 +56,12 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots', 'locale'],
       apply(ctx) {
-        ctx.locale.register('pipilu.remote', {
+        ctx.effect(() => ctx.locale.register(NS, {
           zh: { title: '远程桌面', opening: '正在打开…', opened: '已在浏览器打开远程桌面。', openFailed: '暂时无法打开，请确认 DeepSeek 正在运行后重试。' },
           en: { title: 'Remote desktop', opening: 'Opening…', opened: 'Remote desktop opened in your browser.', openFailed: 'Unable to open. Check that DeepSeek is running and try again.' },
-        });
+        }), 'remote-desktop: dictionaries');
         ctx.slots.inject('sidebar.footer.action', () => ctx.slots.register({
-          name: 'sidebar.footer.action', id: 'pipilu-remote-desktop-sidebar', order: 60, locale: 'pipilu.remote',
+          name: 'sidebar.footer.action', id: 'pipilu-remote-desktop-sidebar', order: 60, locale: NS,
         }, Entry));
       },
     };

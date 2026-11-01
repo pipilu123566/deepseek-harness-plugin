@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="808" viewBox="0 0 720 404" role="img" aria-label="DSH Remote Desktop 0.4.2 — Workflow illustration - not a screen recording (workflow diagram)">
+        <style>svg{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}.c-grid{fill:none;stroke:#263346}.c-lane{fill:#131e2e;stroke:#34445d}.c-mask{fill:#101a28}.c-frontend{fill:#10333e;stroke:#22d3ee}.c-backend{fill:#103d31;stroke:#34d399}.t-primary{fill:#eef4fc}.t-muted{fill:#b2bfd1}.t-dim{fill:#95a8bf}.a-default{fill:none;stroke:#7890ab}.m-default{fill:#7890ab}</style><!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="720" height="404" fill="#0c1421"/><!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Swimlanes -->
+        <rect x="40" y="52" width="640" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Computer</text>
+
+        <rect x="40" y="176" width="640" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / Touch</text>
+
+        <!-- Edge paths -->
+        <path d="M 134 119 L 384 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 476 119 L 579 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 134 243 L 384 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 476 243 L 579 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+        <!-- Nodes -->
+        <rect x="42" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="42" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="88" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Top bar</text>
+        <text x="88" y="131" class="t-muted" font-size="8" text-anchor="middle">Screen / mode</text>
+
+        <rect x="384" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="384" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="430" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Click target</text>
+        <text x="430" y="131" class="t-muted" font-size="8" text-anchor="middle">Direct input</text>
+
+        <rect x="579" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="579" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="625" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Keys / mouse</text>
+        <text x="625" y="131" class="t-muted" font-size="8" text-anchor="middle">Scroll / zoom</text>
+
+        <rect x="42" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="42" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="88" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Top bar</text>
+        <text x="88" y="255" class="t-muted" font-size="8" text-anchor="middle">Screen / mode</text>
+
+        <rect x="384" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="384" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="430" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Click target</text>
+        <text x="430" y="255" class="t-muted" font-size="8" text-anchor="middle">Tap / locate</text>
+
+        <rect x="579" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="579" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="625" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Two fingers</text>
+        <text x="625" y="255" class="t-muted" font-size="8" text-anchor="middle">Scroll / zoom</text>
+
+        <!-- Edge labels -->
+
+
+
+
+
+        <text x="40" y="23" class="t-primary" font-size="18" font-weight="500">DSH Remote Desktop 0.4.2</text><text x="40" y="41" class="t-muted" font-size="10">Top-bar settings, direct typing, keyboard/mouse and touch</text><text x="40" y="321" class="t-primary" font-size="11">Wheel: scroll     Shift + wheel: horizontal     Ctrl / Cmd + wheel: zoom</text><text x="40" y="374" class="t-muted" font-size="10">Workflow illustration, not a recording. No real desktop, login link or password.</text></svg>

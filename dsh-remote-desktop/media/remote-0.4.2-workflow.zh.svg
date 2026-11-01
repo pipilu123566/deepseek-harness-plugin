@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="808" viewBox="0 0 720 404" role="img" aria-label="DSH Remote Desktop 0.4.2 — 操作流程示意 · 非界面实录 (workflow diagram)">
+        <style>svg{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}.c-grid{fill:none;stroke:#263346}.c-lane{fill:#131e2e;stroke:#34445d}.c-mask{fill:#101a28}.c-frontend{fill:#10333e;stroke:#22d3ee}.c-backend{fill:#103d31;stroke:#34d399}.t-primary{fill:#eef4fc}.t-muted{fill:#b2bfd1}.t-dim{fill:#95a8bf}.a-default{fill:none;stroke:#7890ab}.m-default{fill:#7890ab}</style><!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <rect width="720" height="404" fill="#0c1421"/><!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Swimlanes -->
+        <rect x="40" y="52" width="640" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / 电脑</text>
+
+        <rect x="40" y="176" width="640" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / 手机</text>
+
+        <!-- Edge paths -->
+        <path d="M 134 119 L 384 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 476 119 L 579 119" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 134 243 L 384 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path d="M 476 243 L 579 243" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+        <!-- Nodes -->
+        <rect x="42" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="42" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="88" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">顶部设置</text>
+        <text x="88" y="131" class="t-muted" font-size="8" text-anchor="middle">屏幕 · 画质</text>
+
+        <rect x="384" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="384" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="430" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">点击目标</text>
+        <text x="430" y="131" class="t-muted" font-size="8" text-anchor="middle">直接输入</text>
+
+        <rect x="579" y="93" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="579" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+        <text x="625" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">键鼠操作</text>
+        <text x="625" y="131" class="t-muted" font-size="8" text-anchor="middle">滚动 · 缩放</text>
+
+        <rect x="42" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="42" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="88" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">顶部设置</text>
+        <text x="88" y="255" class="t-muted" font-size="8" text-anchor="middle">屏幕 · 画质</text>
+
+        <rect x="384" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="384" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="430" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">点击目标</text>
+        <text x="430" y="255" class="t-muted" font-size="8" text-anchor="middle">点按 · 定位</text>
+
+        <rect x="579" y="217" width="92" height="52" rx="6" class="c-mask"/>
+        <rect x="579" y="217" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+        <text x="625" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">双指操作</text>
+        <text x="625" y="255" class="t-muted" font-size="8" text-anchor="middle">滚动 · 缩放</text>
+
+        <!-- Edge labels -->
+
+
+
+
+
+        <text x="40" y="23" class="t-primary" font-size="18" font-weight="500">DSH 远程桌面 0.4.2</text><text x="40" y="41" class="t-muted" font-size="10">顶部设置 · 直接输入 · 电脑键鼠与触屏操作</text><text x="40" y="321" class="t-primary" font-size="11">滚轮滚动 · Shift + 滚轮横向 · Ctrl / ⌘ + 滚轮缩放</text><text x="40" y="374" class="t-muted" font-size="10">流程示意，非界面实录；不展示真实桌面、登录链接或密码。</text></svg>

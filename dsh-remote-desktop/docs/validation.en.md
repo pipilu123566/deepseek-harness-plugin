@@ -2,32 +2,34 @@
 
 [中文](validation.md) | English
 
-This record covers 0.4.1 on DeepSeek Harness 0.2.1-rc.5 and Apple Silicon Macs running macOS 13 or later. Release notes record the final commit, artifact SHA-256 and public-download verification.
+This record covers Remote Desktop 0.4.2 on DeepSeek Harness 0.2.1-rc.5. The controlled host is an Apple Silicon Mac running macOS 13+. Client-side keyboard mapping does not add Windows/Linux controlled hosts. See the Release for the final commit, tag, package SHA-256 and public-download verification.
 
-## Functional and package checks
+## Features and tests
 
-All 18 project checks cover authentication, permissions, exclusive connections, signaling/input isolation, stale connection cleanup, zoom geometry, display/mode allowlists, missing-display rejection, display-wake ordering, cancellation, motion/scroll coalescing and reliable release handling.
+- Display, quality and connection details live in the top bar. A top-right phone icon opens the access dialog; closing/backgrounding clears this page’s URL and QR code.
+- The separate shortcut-input pane/button is removed; existing direct keyboard input remains. No new IME path or system-password handling was added.
+- Wheel scrolls remote content; Shift-wheel scrolls horizontally; Ctrl/Command-wheel zooms. Move view mode pans with drag or wheel.
+- Auto maps Windows/Linux client Control/Windows modifiers to Mac Command/Control; Mac clients retain native keys. PC and Raw modes are also selectable. Use Raw for terminal Control chords; browser/system-reserved shortcuts may not be forwarded.
+- Locale cleanup fixes loss of the Desktop sidebar entry after hot updates, with a one-time namespace migration for pages retaining the old dictionary.
 
-Responsive mode captures up to 1440p and prioritizes frame rate; Detail mode captures native pixels up to 3840×2160 and prioritizes resolution. Display selection remains independent. The manual resolution parameter was removed from both the page and connection API, so old pages must be reloaded after upgrading.
+All 27 automated checks cover desktop mappings, two dialog event cases, two client remount cases, authentication, permissions, exclusive leases, signaling/input isolation, cancellation, input coalescing and touch-zoom geometry. Three actual app.js event replays (PC Ctrl+C, Shift-wheel and Command-wheel) also pass. Their DOM/DataChannel fixtures are not physical-device acceptance.
 
-The local 0.4.1 tarball passed isolated profile installation, real Loader activation, owner login, web assets, protected APIs, 404 routes after uninstall and successful reinstall. The running Mac was updated and enabled without restarting the Host; its 29 installed files matched that local artifact. Public release preparation rebuilds from a fixed commit and verifies the final assets separately; identical version numbers do not imply identical documentation or artifact bytes.
+The final package must be built from a clean fixed commit and compared file by file. Release verification covers isolated Loader/owner login/assets, anonymous rejection, uninstall 404 and reinstall, followed by anonymous download/checksum verification and installation in another fresh profile. Results and checksum belong in the Release; a maintainer’s source-link installation does not substitute for the public package.
 
-## Device and browser evidence
+## Device evidence
 
-- Earlier versions received real desktop video. A Mac validation window confirmed Unicode text, special characters, a synthetic test password and mouse input. A user confirmed phone connection, operation, disconnect and pinch zoom.
-- Version 0.4.0 checked all four capture sizes on both physical displays. The user subsequently confirmed improved phone clarity and operation of both the built-in and external display.
-- Version 0.4.1 Chrome received Detail video at 2940×1912 and Responsive video at 2214×1440; mode changes reconnected successfully. At 390 CSS px there was no horizontal overflow and only two quality modes were present.
-- The user reported about one second of trailing delay at the old 4K setting, with 1440p somewhat better, then confirmed 0.4.1 Responsive mode was clearly improved and usable. Detail-mode latency on that mobile network was not separately confirmed.
-- The browser was categorized as WeChat or another embedded browser; the exact phone and network were not recorded. Layout checks at 390×844 and 820×1180 were browser emulation, not real iPad acceptance.
+On 2026-11-01, after reloading and checking the top controls, shortcut-input removal and another computer’s controls, the user confirmed that layout and keyboard/mouse worked normally. Direct input already worked; this is not described as an input-bug fix. Client device, OS and browser details were not recorded, so not every combination is covered. Earlier user checks confirmed phone connection, operation, disconnect, pinch zoom, both displays and improved Responsive mode.
 
-## Latency evidence boundaries
+The sidebar fix passed repeated mounts against the target Host’s actual LocaleRuntime and repeated Desktop hot updates retained one entry. These device observations cover the runtime code included in this release; documentation/metadata updates are not a new full device test.
 
-Under the same throttled input replay, the old implementation queued 65596 bytes and dropped button release; the new implementation retained the latest position and delivered release with 134 queued bytes. At a simulated 32KB/s this corresponds to approximately 2002ms versus 4ms of queue-tail time. This is transport-queue simulation, not mobile end-to-end latency.
+## Native helper and historical performance
 
-Local browser samples for Detail/Responsive mode were approximately 29/30 FPS, 69/22ms receive-buffer delay and 4/1ms network RTT. They do not establish a same-network mobile comparison or full input-to-picture latency. Capture uses a two-frame queue and avoids submitting capture frames older than 150ms; that is not an end-to-end latency guarantee.
+Version 0.4.2 reuses the unchanged 0.4.1 native helper, checking the archive SHA-256 before extraction and application signature before use. Capture quality, authentication, leases and wake policies are unchanged.
 
-## Remaining gaps and known limits
+Historical 0.4.1 local Chrome samples received 2940×1912 in Detail and 2214×1440 in Responsive, with successful mode changes. Approximately 29/30 FPS, 69/22ms receive buffering and 4/1ms network RTT were local samples, not mobile end-to-end guarantees. Prior throttled-input replays verified stale-motion coalescing and reliable release handling, not arbitrary network performance.
 
-Real iPad, different browsers/networks, TURN, full system wake, lock-screen password entry/unlock and system secure input need separate acceptance. Ordinary password-field success does not establish Touch ID or FileVault support. A sleeping-display failure was reproduced on a locked Mac and capture startup recovered after display wake; this does not prove usable lock-screen video or password entry. The helper is ad hoc signed and not notarized; each Mac requires its own permission grants.
+## Limits and media provenance
 
-A Desktop hot update left the sidebar entry missing while the Host and existing mobile URL continued to work. The app was not restarted for this issue, and restoration after a normal restart remains unconfirmed. Intel Mac, Windows, Linux, audio and file transfer are unsupported.
+Real iPad, every client/network combination, TURN, full system wake, lock-screen password entry/unlock and secure system inputs have not been individually accepted. Ordinary input does not establish Touch ID or pre-login FileVault support. The helper is ad hoc signed and not notarized; each Mac must grant screen-recording and Accessibility access. Audio, file transfer and cross-device clipboard synchronization are not provided.
+
+The 0.4.2 homepage images are bilingual workflow illustrations, not UI recordings. AI_Animation’s dynamic-archify workflow layout produced SVG, rasterized offline as PNG; both languages were visually inspected. The 0.4.1 UI image and 0.3.6 animation remain clearly historical. Publication checks read back public media bytes and README references; HTTP checks do not count as visual GitHub-page acceptance when browser use is unavailable.

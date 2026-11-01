@@ -17,7 +17,7 @@
 | 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
 | --- | --- | --- | --- |
 | [DSH Balance](dsh-balance/README.md) | 查看账户余额、今日及会话消耗，配置模型单价 | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
-| [DSH 远程桌面](dsh-remote-desktop/README.md) | 手机浏览器远控 Mac、键鼠输入、双指缩放和平移 | [0.4.1 预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.1) | DeepSeek Harness 0.2.1-rc.5 |
+| [DSH 远程桌面](dsh-remote-desktop/README.md) | 电脑与手机浏览器远控 Mac、键鼠映射和触摸缩放 | [0.4.2 预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2) | DeepSeek Harness 0.2.1-rc.5 |
 | [DSH 文档库](dsh-documents/README.md) | 本地文档浏览、固定 Inbox、实时预览与自动保存、手动引用 | [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0) | DeepSeek Harness 0.2.1-rc.5 |
 
 各插件的功能、安装步骤和支持范围见对应目录的说明。
@@ -26,10 +26,10 @@
 
 以下包含实际插件界面与功能原型，具体来源见对应插件首页。点击预览进入插件首页，查看完整动图、静态分步和支持范围。
 
-| 余额与消耗 · 1.1.0 | 远程桌面 · 0.4.1 预览版 | 文档库 · 0.3.0 |
+| 余额与消耗 · 1.1.0 | 远程桌面 · 0.4.2 预览版 | 文档库 · 0.3.0 |
 | --- | --- | --- |
-| [![余额与消耗功能原型](dsh-balance/media/balance-1.1.0-overview.zh.png)](dsh-balance/README.md#使用演示) | [![远程桌面实际插件界面](dsh-remote-desktop/media/remote-0.4.1-controls.png)](dsh-remote-desktop/README.md#使用演示) | [![文档库功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示) |
-| 看余额、设置单价、按会话查看费用估算 | 手机连接 Mac、缩放定位、文字输入与断开 | 找文档、追加 Inbox、引用到会话 |
+| [![余额与消耗功能原型](dsh-balance/media/balance-1.1.0-overview.zh.png)](dsh-balance/README.md#使用演示) | [![远程桌面操作流程示意](dsh-remote-desktop/media/remote-0.4.2-workflow.zh.png)](dsh-remote-desktop/README.md#使用演示) | [![文档库功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示) |
+| 看余额、设置单价、按会话查看费用估算 | 顶部选屏幕和画质、直接输入、电脑键鼠与触屏操作 | 找文档、追加 Inbox、引用到会话 |
 
 仓库根目录不是插件。安装时进入对应插件说明，下载该插件的 Release `.tgz`，不要把本仓库根地址直接交给插件安装命令。已发布版本的支持范围以其 README 和验收记录为准。
 

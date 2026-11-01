@@ -10,42 +10,41 @@
   <script type="module" src="./app.js"></script>
 </head>
 <body>
-  <div class="page">
+  <div class="page" id="remote-page">
     <header class="page-header">
-      <a class="back-link" id="back-link" href="../" aria-label="返回 DeepSeek">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg>
-        <span>DeepSeek</span>
-      </a>
-      <span class="page-label">远程桌面</span>
-      <button class="icon-button" id="refresh" type="button" aria-label="刷新连接状态" title="刷新连接状态">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 7a7 7 0 0 1 11.5-2L20 8M4 16l2.4 3A7 7 0 0 0 18 17"/></svg>
-      </button>
-    </header>
-
-    <main>
-      <div class="heading-row">
-        <div>
-          <p class="eyebrow">远程连接</p>
-          <h1 id="machine-name">这台 Mac</h1>
-        </div>
-        <div class="connection-actions">
-          <div class="status-pill" id="status-pill" data-tone="neutral" role="status" aria-live="polite"><span class="status-dot" aria-hidden="true"></span><span id="status-label">正在读取状态</span></div>
-          <button class="primary-button" id="connect" type="button" disabled>连接这台 Mac</button>
-          <button class="secondary-button" id="setup" type="button" hidden>在 Mac 设置权限</button>
-          <button class="secondary-button" id="disconnect" type="button" hidden>断开连接</button>
-        </div>
+      <div class="header-brand">
+        <a class="back-link" id="back-link" href="../" aria-label="返回 DeepSeek">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg><span>DeepSeek</span>
+        </a>
+        <span class="page-label">远程桌面</span>
       </div>
-
-      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
-
-      <div class="workspace" id="workbench">
+      <div class="connection-heading">
+        <h1 id="machine-name">这台 Mac</h1>
+        <div class="status-pill" id="status-pill" data-tone="neutral" role="status" aria-live="polite"><span class="status-dot" aria-hidden="true"></span><span id="status-label">正在读取状态</span></div>
+      </div>
         <div class="capture-settings">
           <label>显示器 <select id="display-select" aria-label="选择显示器"><option value="0">主显示器</option></select></label>
           <label>画质 <select id="priority-select" aria-label="选择画质模式"><option value="responsive">流畅优先</option><option value="detail">清晰优先</option></select></label>
-          <details class="connection-metrics"><summary>连接状态</summary>
+          <details class="connection-metrics"><summary>连接状态</summary><div class="metrics-panel">
           <output id="stream-health" title="输入为操作确认往返；缓冲为视频接收缓冲，不是完整屏幕响应时间。" aria-live="off"></output>
-          <output id="capture-size" aria-live="polite">连接后显示实际分辨率</output></details>
+          <output id="capture-size" aria-live="polite">连接后显示实际分辨率</output></div></details>
         </div>
+      <div class="header-actions">
+        <button class="primary-button" id="connect" type="button" disabled>连接这台 Mac</button>
+        <button class="secondary-button" id="setup" type="button" hidden>在 Mac 设置权限</button>
+        <button class="secondary-button" id="disconnect" type="button" hidden>断开连接</button>
+        <button class="icon-button" id="mobile-access-open" type="button" aria-label="在手机或 iPad 上打开" aria-haspopup="dialog" aria-controls="mobile-access-dialog" title="在手机或 iPad 上打开">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M10 18h4"/></svg>
+        </button>
+        <button class="icon-button" id="refresh" type="button" aria-label="刷新连接状态" title="刷新连接状态">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6.1 7a7 7 0 0 1 11.5-2L20 8M4 16l2.4 3A7 7 0 0 0 18 17"/></svg>
+        </button>
+      </div>
+    </header>
+    <main>
+      <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+      <div class="workspace" id="workbench">
         <section class="desktop-panel" aria-label="电脑画面与控制">
           <div class="desktop-toolbar">
             <div class="viewer-label"><span id="live-dot" class="live-dot" aria-hidden="true"></span><span id="viewer-label">电脑画面</span></div>
@@ -75,51 +74,33 @@
             <output id="zoom-value" aria-label="画面缩放">100%</output>
             <button class="icon-button" id="zoom-in" type="button" aria-label="放大画面" disabled>+</button>
             <button class="small-button" id="zoom-reset" type="button" disabled>适应屏幕</button>
-            <span>双指缩放，放大后双指移动画面</span>
-          </div>
-          <div class="keyboard-controls" id="keyboard-controls">
-            <div class="quick-keys" role="group" aria-label="电脑快捷键">
-              <button type="button" data-key="escape" disabled>Esc</button>
-              <button type="button" data-key="tab" disabled>Tab</button>
-              <button type="button" data-key="enter" disabled>Enter</button>
-              <button type="button" data-key="backspace" aria-label="退格" disabled>⌫</button>
-              <span class="key-divider" aria-hidden="true"></span>
-              <button type="button" data-key="selectAll" aria-label="全选 Command A" disabled>⌘ A</button>
-              <button type="button" data-key="copy" aria-label="在 Mac 上复制 Command C" disabled>⌘ C</button>
-              <button type="button" data-key="paste" aria-label="粘贴 Mac 剪贴板 Command V" disabled>⌘ V</button>
-              <button type="button" data-key="left" aria-label="左方向键" disabled>←</button>
-              <button type="button" data-key="right" aria-label="右方向键" disabled>→</button>
-              <button type="button" data-key="up" aria-label="上方向键" disabled>↑</button>
-              <button type="button" data-key="down" aria-label="下方向键" disabled>↓</button>
-            </div>
-            <form class="typing-form" id="typing-form" autocomplete="off">
-              <label class="sr-only" for="typing-mode">输入类型</label>
-              <select id="typing-mode" aria-label="输入类型" disabled><option value="password">密码</option><option value="text">文字</option></select>
-              <label class="sr-only" for="typing-input">发送到电脑的内容</label>
-              <input id="typing-input" type="password" placeholder="先点选电脑中的输入框" maxlength="1024" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" disabled>
-              <button class="send-button" id="send-text" type="submit" disabled>输入到电脑</button>
-            </form>
-            <p class="input-note" id="input-note">内容仅通过远控通道输入，发送后清空。⌘ V 使用 Mac 上的剪贴板。</p>
+            <span>滚轮滚动 · Ctrl / ⌘ + 滚轮缩放 · 触屏双指缩放</span>
           </div>
         </section>
 
 
       </div>
-      <div class="page-help">
-        <p>点按操作，双指张合缩放；放大后双指移动，适应屏幕时双指滚动电脑内容。开启「移动画面」也可单指平移。<br>请保持 Mac 唤醒，并保持 DeepSeek 运行。原生助手在菜单栏提供本机断开入口。</p>
-        <details class="mobile-access">
-          <summary>在手机或 iPad 上打开</summary>
-          <p>此链接可登录本机远程桌面，仅供本人使用。</p>
-          <div class="mobile-link-actions">
-            <button class="secondary-button" id="prepare-mobile-link" type="button">准备手机访问链接</button>
-            <button class="secondary-button" id="copy-mobile-link" type="button" hidden>复制手机访问链接</button>
-          </div>
-          <p id="mobile-link-status" role="status" aria-live="polite"></p>
-          <canvas id="mobile-qr" aria-label="本人手机登录二维码" hidden></canvas>
-        </details>
-      </div>
     </main>
-    <footer class="page-footer"><span>连接当前 Mac 桌面</span><span id="connection-detail">等待连接</span></footer>
+    <footer class="page-footer">
+      <span id="connection-detail">等待连接</span>
+      <details class="page-help"><summary>操作提示</summary><div class="help-panel">
+        <p>电脑：先点击远程画面，再直接使用键盘。滚轮滚动远端内容，Shift + 滚轮横向滚动，Ctrl / ⌘ + 滚轮缩放画面；开启「移动画面」后，拖动或滚轮平移画面。</p>
+        <label>键盘映射 <select id="keyboard-map" aria-label="键盘映射"><option value="auto">自动识别电脑</option><option value="pc">PC Ctrl → Mac ⌘</option><option value="raw">原样传递按键</option></select></label>
+        <p>自动模式下，Windows / Linux 的 Ctrl 与 Mac ⌘ 对应。终端需要原生 Ctrl 组合键时，选择「原样传递按键」。浏览器或系统保留的快捷键可能无法转发。</p>
+        <p>手机 / iPad：点按操作，双指张合缩放；放大后双指移动，适应屏幕时双指滚动内容。</p>
+        <p>请保持 Mac 唤醒，并保持 DeepSeek 运行。原生助手在菜单栏提供本机断开入口。</p>
+      </div></details>
+    </footer>
+    <dialog class="mobile-access" id="mobile-access-dialog" aria-labelledby="mobile-access-title">
+      <div class="dialog-heading"><h2 id="mobile-access-title">在手机或 iPad 上打开</h2><button class="icon-button" id="mobile-access-close" type="button" aria-label="关闭手机访问窗口" autofocus>×</button></div>
+      <p>此链接可登录本机远程桌面，仅供本人使用。</p>
+      <div class="mobile-link-actions">
+        <button class="secondary-button" id="prepare-mobile-link" type="button">准备手机访问链接</button>
+        <button class="secondary-button" id="copy-mobile-link" type="button" hidden>复制手机访问链接</button>
+      </div>
+      <p id="mobile-link-status" role="status" aria-live="polite"></p>
+      <canvas id="mobile-qr" aria-label="本人手机登录二维码" hidden></canvas>
+    </dialog>
   </div>
 
   <noscript><p class="notice">请启用浏览器 JavaScript 后使用远程桌面。</p></noscript>

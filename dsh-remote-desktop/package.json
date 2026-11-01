@@ -1,6 +1,6 @@
 {
   "name": "@pipilu/dsh-remote-desktop",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "private": true,
   "description": "Native WebRTC remote desktop for DeepSeek Harness",
   "type": "module",
