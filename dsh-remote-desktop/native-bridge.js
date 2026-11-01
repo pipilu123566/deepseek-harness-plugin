@@ -15,13 +15,13 @@ export function createNativeBridge({ executable = bundledAgent, testPattern = fa
         await access(executable);
         const data = await new Promise((resolve, reject) => execFile(executable, ['--permissions'], { timeout: 4000, maxBuffer: 4096, env: minimalEnv() }, (error, stdout) => error ? reject(error) : resolve(stdout)));
         const p = JSON.parse(data);
-        value = { installed: true, screen: p.screen === true, input: p.input === true, testPattern: false };
+        value = { installed: true, screen: p.screen === true, input: p.input === true, testPattern: false, displays: Array.isArray(p.displays)?p.displays:[] };
       } catch { value = { installed: false, screen: false, input: false, testPattern: false }; }
       lastProbe = Date.now(); return value;
     })().finally(() => { probe = null; });
     return probe;
   }
-  function start({ onMessage, onClose }) {
+  function start({ onMessage, onClose, captureOptions = {} }) {
     let ended = false, pending = '', stopTimer, started = false, awake;
     const child = spawnProcess(executable, testPattern ? ['--test-pattern'] : [], { stdio: ['pipe', 'pipe', 'pipe'], env: minimalEnv() });
     // Discard native diagnostics: SDP, text and desktop contents never enter Host logs.
@@ -52,7 +52,7 @@ export function createNativeBridge({ executable = bundledAgent, testPattern = fa
               awake=spawnProcess('/usr/bin/caffeinate',['-d','-i','-w',String(child.pid)],{stdio:'ignore',env:minimalEnv()});
               awake.once('error',()=>{if(!ended){onMessage({type:'error',code:'display-wake-failed'});stop();}});
             }
-            send({ type: 'start', iceServers, relayOnly });
+            send({ type: 'start', iceServers, relayOnly, ...captureOptions });
           }).catch(()=>{if(!ended){onMessage({type:'error',code:'display-wake-failed'});stop();}});
         }
         else if (m.type === 'ready') { clearTimeout(startup); onMessage(m); }

@@ -4,11 +4,11 @@ import http from 'node:http';
 import { EventEmitter, once } from 'node:events';
 import { WebSocket } from 'ws';
 import { DesktopController } from '../controller.js';
-import { createDesktopServer, validSignal } from '../server.js';
+import { createDesktopServer, validSignal, captureOptions } from '../server.js';
 
 async function fixture(t,permission={installed:true,screen:true,input:true}) {
  const sessions=[];
- const native={configuration:{iceServers:[]},status:async()=>permission,start(callbacks){const agent={stopped:false,sent:[],send(m){this.sent.push(m);return true;},stop(){this.stopped=true;}};sessions.push(agent);queueMicrotask(()=>callbacks.onMessage({type:'ready'}));return agent;}};
+ const native={configuration:{iceServers:[]},status:async()=>permission,start(callbacks){const agent={captureOptions:callbacks.captureOptions,stopped:false,sent:[],send(m){this.sent.push(m);return true;},stop(){this.stopped=true;}};sessions.push(agent);queueMicrotask(()=>callbacks.onMessage({type:'ready'}));return agent;}};
  const control=new DesktopController(),api=createDesktopServer({control,native,machineName:'Test Mac',getEntryUrl:()=> 'https://example.invalid/',authorize:req=>req.headers.cookie?.includes('owner=yes')?'owner':false});
  const server=http.createServer(api.handler);server.on('upgrade',api.upgrade);server.listen(0,'127.0.0.1');await once(server,'listening');
  const origin=`http://127.0.0.1:${server.address().port}`;
@@ -42,3 +42,21 @@ test('input data and configuration injection over signaling are rejected',async 
 });
 test('signal schema excludes remote spawn and oversized payloads',()=>{assert.equal(validSignal({type:'start',iceServers:[]}),false);assert.equal(validSignal({type:'offer',sdp:'v=0',executable:'/bin/sh'}),false);assert.equal(validSignal({type:'offer',sdp:'a'.repeat(250000)}),false);assert.equal(validSignal({type:'candidate',candidate:'test',sdpMid:'0',sdpMLineIndex:-1}),false);});
 test('stale close never releases a newer lease',()=>{const c=new DesktopController();const a=c.connect();const first=new EventEmitter();first.terminate=()=>{};c.attachSocket(a,first);c.disconnect(a);const b=c.connect();first.emit('close');assert.equal(c.owned(b),true);c.dispose();});
+
+test('resolution and monitor choices reject arbitrary native configuration',()=>{
+ assert.deepEqual(captureOptions({}),{displayId:0,quality:'1440',priority:'responsive'});
+ assert.deepEqual(captureOptions({displayId:42,priority:'detail'}),{displayId:42,quality:'2160',priority:'detail'});
+ for(const value of [{displayId:-1},{displayId:1.5},{quality:'8k'},{iceServers:[]},{executable:'/bin/sh'},{quality:1080},{priority:'unknown'}])assert.throws(()=>captureOptions(value));
+});
+test('selected display and resolution reach only the reserved native session',async t=>{
+ const f=await fixture(t,{installed:true,screen:true,input:true,displays:[{id:42,name:'External',width:3840,height:2160}]});
+ assert.equal((await f.request('connect','POST','owner=yes',{displayId:99,priority:'detail'})).status,409);
+ assert.equal(f.control.phase,'idle');
+ const r=await f.request('connect','POST','owner=yes',{displayId:42,priority:'detail'});assert.equal(r.status,200);
+ const cookie='owner=yes; '+r.headers.get('set-cookie').split(';')[0];
+ const ws=new WebSocket(f.origin.replace('http:','ws:')+'/remote-desktop/socket',{headers:{Cookie:cookie,Origin:f.origin}});await once(ws,'open');
+ assert.deepEqual(f.sessions[0].captureOptions,{displayId:42,quality:'2160',priority:'detail'});
+ assert.equal((await f.request('connect','POST','owner=yes',{displayId:0,priority:'responsive'})).status,409);
+ assert.deepEqual(f.sessions[0].captureOptions,{displayId:42,quality:'2160',priority:'detail'});
+ const closed=once(ws,'close');ws.close();await closed;
+});

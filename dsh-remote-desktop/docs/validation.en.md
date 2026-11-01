@@ -2,19 +2,32 @@
 
 [中文](validation.md) | English
 
-Version 0.3.6 is the first public preview, prepared from local version 0.3.5. Host, Client, web UI, input protocol and native helper retain the implementation. Changes cover public metadata, licensing, bilingual documentation, independent source layout and sanitized deployment examples. The helper has been stripped of debug symbols containing local build paths and ad hoc signed again; its executable code section is unchanged. Publishing does not replace the running local 0.3.5 installation.
+This record covers 0.4.1 on DeepSeek Harness 0.2.1-rc.5 and Apple Silicon Macs running macOS 13 or later. Release notes record the final commit, artifact SHA-256 and public-download verification.
 
-## Existing functional evidence
+## Functional and package checks
 
-- On DSH 0.2.1-rc.5 and an Apple Silicon Mac, real video was received at 1920×1080. A Mac validation window confirmed Chinese text, special characters, a synthetic test password and a mouse click. Disconnect and reconnect succeeded.
-- A user confirmed phone connection, operation, disconnect, and version 0.3.3's zoom buttons and pinch gestures. The browser was categorized as WeChat or another embedded browser; the exact device and network were not recorded.
-- Checks at 390×844 and 820×1180 used browser emulation and do not establish real iPad coverage.
-- Version 0.3.5 reproduced capture failure with a sleeping display on the same locked Mac. Waking the display restored 1920×1080 capture startup; the helper and wake assertion exited on disconnect. A full phone retest of that fix is still pending.
+All 18 project checks cover authentication, permissions, exclusive connections, signaling/input isolation, stale connection cleanup, zoom geometry, display/mode allowlists, missing-display rejection, display-wake ordering, cancellation, motion/scroll coalescing and reliable release handling.
 
-## Public release checks
+Responsive mode captures up to 1440p and prioritizes frame rate; Detail mode captures native pixels up to 3840×2160 and prioritizes resolution. Display selection remains independent. The manual resolution parameter was removed from both the page and connection API, so old pages must be reloaded after upgrading.
 
-The 13 project checks cover authentication, permissions, exclusive connections, signaling/input isolation, stale connection cleanup, zoom anchors and coordinates, display-wake ordering, disconnect and cancellation cleanup. Release preparation packs a fixed commit, compares the artifact against Git, and installs it in an isolated DSH_HOME/profile to check the real Loader, owner login, protected APIs, web resources, uninstall and reinstall. The Release notes record the final commit, SHA-256 and public-download verification results.
+The local 0.4.1 tarball passed isolated profile installation, real Loader activation, owner login, web assets, protected APIs, 404 routes after uninstall and successful reinstall. The running Mac was updated and enabled without restarting the Host; its 29 installed files matched that local artifact. Public release preparation rebuilds from a fixed commit and verifies the final assets separately; identical version numbers do not imply identical documentation or artifact bytes.
 
-## Unverified scenarios and limits
+## Device and browser evidence
 
-Real iPad behavior, all browsers and different networks, TURN, full system wake, lock-screen password entry/unlock and system secure-input cases are not exhaustively validated. Ordinary password-field success does not prove Touch ID or FileVault support. The helper is ad hoc signed and not notarized; each target Mac needs its own permission grants.
+- Earlier versions received real desktop video. A Mac validation window confirmed Unicode text, special characters, a synthetic test password and mouse input. A user confirmed phone connection, operation, disconnect and pinch zoom.
+- Version 0.4.0 checked all four capture sizes on both physical displays. The user subsequently confirmed improved phone clarity and operation of both the built-in and external display.
+- Version 0.4.1 Chrome received Detail video at 2940×1912 and Responsive video at 2214×1440; mode changes reconnected successfully. At 390 CSS px there was no horizontal overflow and only two quality modes were present.
+- The user reported about one second of trailing delay at the old 4K setting, with 1440p somewhat better, then confirmed 0.4.1 Responsive mode was clearly improved and usable. Detail-mode latency on that mobile network was not separately confirmed.
+- The browser was categorized as WeChat or another embedded browser; the exact phone and network were not recorded. Layout checks at 390×844 and 820×1180 were browser emulation, not real iPad acceptance.
+
+## Latency evidence boundaries
+
+Under the same throttled input replay, the old implementation queued 65596 bytes and dropped button release; the new implementation retained the latest position and delivered release with 134 queued bytes. At a simulated 32KB/s this corresponds to approximately 2002ms versus 4ms of queue-tail time. This is transport-queue simulation, not mobile end-to-end latency.
+
+Local browser samples for Detail/Responsive mode were approximately 29/30 FPS, 69/22ms receive-buffer delay and 4/1ms network RTT. They do not establish a same-network mobile comparison or full input-to-picture latency. Capture uses a two-frame queue and avoids submitting capture frames older than 150ms; that is not an end-to-end latency guarantee.
+
+## Remaining gaps and known limits
+
+Real iPad, different browsers/networks, TURN, full system wake, lock-screen password entry/unlock and system secure input need separate acceptance. Ordinary password-field success does not establish Touch ID or FileVault support. A sleeping-display failure was reproduced on a locked Mac and capture startup recovered after display wake; this does not prove usable lock-screen video or password entry. The helper is ad hoc signed and not notarized; each Mac requires its own permission grants.
+
+A Desktop hot update left the sidebar entry missing while the Host and existing mobile URL continued to work. The app was not restarted for this issue, and restoration after a normal restart remains unconfirmed. Intel Mac, Windows, Linux, audio and file transfer are unsupported.

@@ -56,6 +56,13 @@ async function readBody(req) {
 }
 function exactKeys(value, keys) { if (Object.keys(value).some(key => !keys.includes(key))) throw new ControlError('invalid-request', 400); }
 
+export function captureOptions(body) {
+  exactKeys(body,['displayId','priority']);
+  const displayId=body.displayId??0,priority=body.priority??'responsive';
+  const quality=priority==='detail'?'2160':'1440';
+  if(!Number.isSafeInteger(displayId)||displayId<0||displayId>0xffffffff||!['responsive','detail'].includes(priority))throw new ControlError('invalid-request',400);
+  return {displayId,quality,priority};
+}
 export function validSignal(m) {
   if (!m || typeof m !== 'object' || Array.isArray(m)) return false;
   if (m.type === 'offer') return typeof m.sdp === 'string' && m.sdp.length < 240000 && Object.keys(m).every(k => ['type','sdp'].includes(k));
@@ -65,7 +72,7 @@ export function validSignal(m) {
 export function createDesktopServer({ control, native, authorize, authorizeLogin, machineName, getEntryUrl }) {
   const wss = new WebSocketServer({ noServer:true, maxPayload:256*1024, perMessageDeflate:false });
   const agents = new Set();
-  let disposed=false;
+  let disposed=false, selection=captureOptions({});
   const snapshot=async token=>({ ...control.snapshot(token), native:await native.status(), machineName, transport:'webrtc', relayConfigured:(native.configuration.iceServers||[]).some(s=>(Array.isArray(s.urls)?s.urls:[s.urls]).some(u=>/^turns?:/.test(u))) });
   async function handler(req,res) {
     try {
@@ -91,7 +98,8 @@ export function createDesktopServer({ control, native, authorize, authorizeLogin
       }
       if(req.method!=='POST'||!['api/connect','api/disconnect','api/setup'].includes(path))return json(res,404,{error:'not-found'});
       if(!validateBrowserRequest(req))return json(res,403,{error:'secure-origin-required'});
-      exactKeys(await readBody(req),[]);
+      const body=await readBody(req);
+      const chosen=path==='api/connect'?captureOptions(body):(exactKeys(body,[]),null);
       if(path==='api/setup'){
         if(control.phase!=='idle')throw new ControlError('desktop-in-use');
         native.setup();return json(res,200,{opened:true});
@@ -102,7 +110,9 @@ export function createDesktopServer({ control, native, authorize, authorizeLogin
         const status=await native.status();
         if(!status.installed)throw new ControlError('agent-unavailable',503);
         if(!status.screen||!status.input)throw new ControlError('permissions-required',503);
+        if(chosen.displayId && !status.displays?.some(d=>d.id===chosen.displayId))throw new ControlError('display-unavailable',409);
         current=control.connect(token);
+        if(control.phase==='connecting')selection=chosen;
         res.setHeader('Set-Cookie',`${LEASE_COOKIE}=${current}; Path=/; HttpOnly; SameSite=Strict${secure}`);
       }else{
         control.disconnect(token);res.setHeader('Set-Cookie',`${LEASE_COOKIE}=; Max-Age=0; Path=/; HttpOnly; SameSite=Strict${secure}`);
@@ -124,7 +134,7 @@ export function createDesktopServer({ control, native, authorize, authorizeLogin
       try{control.attachSocket(token,handle);}catch{stop();return;}
       ws.on('pong',()=>{alive=true;});ws.once('error',stop);ws.once('close',stop);
       try{
-        agent=native.start({onMessage:m=>{send(m);if(m.type==='error'||m.type==='closed')setTimeout(stop,30).unref();},onClose:stop});agents.add(agent);
+        agent=native.start({captureOptions:selection,onMessage:m=>{send(m);if(m.type==='error'||m.type==='closed')setTimeout(stop,30).unref();},onClose:stop});agents.add(agent);
         send({type:'configuration',...native.configuration,testPattern:native.testPattern===true});
       }catch{send({type:'error',code:'agent-unavailable'});stop();return;}
       ws.on('message',(data,binary)=>{

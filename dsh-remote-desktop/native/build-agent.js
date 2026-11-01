@@ -13,7 +13,7 @@ function find(dir){for(const e of readdirSync(dir,{withFileTypes:true})){const p
 const framework=find(join(root,'Vendor'));if(!framework)throw Error('WebRTC macOS framework missing');
 execFileSync('/usr/bin/ditto',[framework,join(contents,'Frameworks/WebRTC.framework')]);
 writeFileSync(join(contents,'Info.plist'),`<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd"><plist version="1.0"><dict>
-<key>CFBundleIdentifier</key><string>wang.pipilu.deepseek.remote</string><key>CFBundleName</key><string>DeepSeek Remote</string><key>CFBundleExecutable</key><string>DeepSeekRemoteAgent</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>0.3.0</string><key>CFBundleVersion</key><string>3</string><key>LSUIElement</key><true/><key>LSMinimumSystemVersion</key><string>13.0</string><key>NSScreenCaptureUsageDescription</key><string>在本人已认证的手机或 iPad 上查看这台 Mac 的桌面。</string><key>NSHighResolutionCapable</key><true/></dict></plist>`);
+<key>CFBundleIdentifier</key><string>wang.pipilu.deepseek.remote</string><key>CFBundleName</key><string>DeepSeek Remote</string><key>CFBundleExecutable</key><string>DeepSeekRemoteAgent</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>0.4.1</string><key>CFBundleVersion</key><string>5</string><key>LSUIElement</key><true/><key>LSMinimumSystemVersion</key><string>13.0</string><key>NSScreenCaptureUsageDescription</key><string>在本人已认证的手机或 iPad 上查看这台 Mac 的桌面。</string><key>NSHighResolutionCapable</key><true/></dict></plist>`);
 execFileSync('/usr/bin/codesign',['--force','--deep','--sign','-',app],{stdio:'inherit'});
 execFileSync('/usr/bin/codesign',['--verify','--deep','--strict',app],{stdio:'inherit'});
 mkdirSync(join(contents,'Resources'),{recursive:true});
@@ -22,5 +22,5 @@ copyFileSync(join(root,'Vendor/WebRTC.xcframework/LICENSE'),join(contents,'Resou
 execFileSync('/usr/bin/codesign',['--force','--deep','--sign','-',app],{stdio:'inherit'});
 const zip=resolve('agent/DeepSeekRemoteAgent.zip');
 execFileSync('/usr/bin/ditto',['-c','-k','--keepParent',app,zip]);
-writeFileSync(resolve('agent/manifest.json'),JSON.stringify({version:'0.3.0',sha256:createHash('sha256').update(readFileSync(zip)).digest('hex')},null,2)+'\n');
+writeFileSync(resolve('agent/manifest.json'),JSON.stringify({version:'0.4.1',sha256:createHash('sha256').update(readFileSync(zip)).digest('hex')},null,2)+'\n');
 console.log('Native remote agent built and signed.');

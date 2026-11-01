@@ -4,9 +4,15 @@
 
 通过手机浏览器查看和操作 Mac，支持键鼠、文字与普通密码框输入、双指缩放和平移。独立社区插件，不调用模型，不暂停或继续 AI 任务。
 
-**0.3.6 公开预览版**，兼容 DeepSeek Harness **0.2.1-rc.5**。电脑端仅支持 **Apple Silicon Mac、macOS 13 及以上**。目前网页和 Mac 权限窗口主要使用中文。
+**0.4.1 公开预览版**，兼容 DeepSeek Harness **0.2.1-rc.5**。电脑端仅支持 **Apple Silicon Mac、macOS 13 及以上**。目前网页和 Mac 权限窗口主要使用中文。
 
 ## 使用演示
+
+![0.4.1 两档画质与显示器选择](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-remote-desktop/media/remote-0.4.1-controls.png)
+
+0.4.1 实际插件界面，来自隔离验收页的 390 CSS px 浏览器视口，非真实手机录屏。当前仅提供「流畅优先」「清晰优先」，显示器独立选择。用户已确认流畅优先明显改善、可正常使用；清晰优先在同一手机网络下的延迟尚未单独确认。
+
+### 历史流程演示（0.3.6）
 
 Mac 授权与准备 → 手机打开本人访问链接 → 缩放、平移定位 → 点选输入框发送文字，结束后断开。
 
@@ -14,19 +20,31 @@ Mac 授权与准备 → 手机打开本人访问链接 → 缩放、平移定位
 
 约 14 秒功能原型，依据 0.3.6 公开预览版绘制，使用合成桌面和演示数据；不是实际手机录屏，也不证明锁屏解锁或真实 iPad 已通过验收。演示不生成真实登录链接或二维码。静态分步图：[连接准备](media/remote-0.3.6-setup.zh.png) · [缩放定位](media/remote-0.3.6-zoom.zh.png) · [文字输入](media/remote-0.3.6-input.zh.png)。
 
-另有 [0.3.3 浏览器手机尺寸测试截图](docs/mobile-zoom-demo.png)，使用合成画面，输入不会操作 Mac；0.3.6 沿用同一远控界面。手机仍需能访问运行插件的 DSH HTTPS 入口，插件不会自动开通公网服务。
+另有 [0.3.3 浏览器手机尺寸测试截图](docs/mobile-zoom-demo.png)，使用合成画面，输入不会操作 Mac，仅用于查看旧版缩放演示。手机仍需能访问运行插件的 DSH HTTPS 入口，插件不会自动开通公网服务。
 
 ## 安装
 
-从 [0.3.6 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.3.6) 下载 `pipilu-dsh-remote-desktop-0.3.6.tgz` 和 `SHA256SUMS`。在两份文件所在目录运行 `shasum -a 256 -c SHA256SUMS`。
+从 [0.4.1 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.1) 下载 `pipilu-dsh-remote-desktop-0.4.1.tgz` 和 `SHA256SUMS`。在两份文件所在目录运行 `shasum -a 256 -c SHA256SUMS`。
 
 在 DeepSeek Harness 的插件管理中选择下载的 `.tgz` 并启用。Web CLI 可在目标 Web profile 中安装本地包：
 
 ```sh
-dsh plugin --profile <你的 Web profile> add /绝对路径/pipilu-dsh-remote-desktop-0.3.6.tgz --ignore-scripts
+dsh plugin --profile <你的 Web profile> add /绝对路径/pipilu-dsh-remote-desktop-0.4.1.tgz --ignore-scripts
 ```
 
 安装后从侧栏打开「远程桌面」。仓库根目录不是插件；包名仍为 `@pipilu/dsh-remote-desktop`，本版不发布到 npm。
+
+## 显示器与画质模式（0.4.1）
+
+画质只保留「流畅优先」和「清晰优先」，显示器独立选择。流畅优先默认以最高 1440p 采集，WebRTC 优先保持帧率，负载或网络吃紧时可降低实际传输分辨率；清晰优先按原生像素采集，最高 3840×2160，并优先保留分辨率，必要时降低帧率。二者均保持比例、不放大超过原生像素，不修改 Mac 本地显示模式。切换模式或显示器会自动重连。
+
+高频鼠标移动和滚动在浏览器按帧合并，点击、松键、快捷键和文字保持可靠传输；严重拥堵时安全断开，不静默丢弃松键。采集队列为两帧，过期画面不追赶。展开「连接状态」可查看实际接收尺寸、网络往返、输入确认往返、接收帧率及视频缓冲。这些数值不是完整的点击到画面响应延迟；静态画面帧率可能自然降低。
+
+用户已在手机确认流畅优先明显改善、可正常使用。清晰优先在当前手机网络下的延迟仍待单独确认；不同设备与网络的效果需要各自验证。
+
+## 从旧版升级
+
+使用新的 0.4.1 `.tgz` 更新已有 `@pipilu/dsh-remote-desktop` 并启用，再重新加载手机远程桌面页。0.4.0 的手动分辨率选项已移除，旧页面的连接参数不再适用。Desktop 热更新曾出现侧栏入口未恢复的情况，Host 仍运行、手机原链接仍可用；可在其他任务结束后正常重启客户端，侧栏入口恢复仍需确认。不要为升级测试卸载正在使用的其他插件。
 
 ## 连接和操作
 
@@ -49,11 +67,11 @@ dsh plugin --profile <你的 Web profile> add /绝对路径/pipilu-dsh-remote-de
 | 项目 | 范围 |
 | --- | --- |
 | Mac | Apple Silicon、macOS 13+；Intel、Windows、Linux 未支持 |
-| 画面 | 当前主显示器，宽度上限 1920，采集目标 30 fps；无音频、多显示器切换或文件传输 |
+| 画面 | 可切换当前连接的显示器，最高 3840×2160（不超过原生像素），采集目标 30 fps；无音频或文件传输 |
 | 输入 | 鼠标、快捷键、Unicode 文字与普通密码框；不承诺所有系统安全输入场景 |
-| 移动端 | 用户已确认手机连接、操作、断开及双指缩放；真实 iPad、所有浏览器和不同网络尚未逐项验证 |
+| 移动端 | 用户已确认手机连接、操作、断开、双指缩放、双屏操作和流畅优先改善；真实 iPad、所有浏览器和不同网络尚未逐项验证 |
 | 睡眠与锁屏 | 连接前唤醒显示器，会话期间保持屏幕和系统唤醒，断开后释放；整机休眠唤醒、锁屏密码输入与解锁仍待验证 |
-| 原生助手 | 随包提供 0.3.0 助手，解压时校验 SHA-256 和应用签名；本地临时签名，未做 Apple 公证 |
+| 原生助手 | 随包提供 0.4.1 助手，解压时校验 SHA-256 和应用签名；本地临时签名，未做 Apple 公证 |
 
 Mac 必须保持开机、联网并运行 DeepSeek Harness。显示器唤醒不取消系统锁屏，不支持 FileVault 重启前解锁或替代 Touch ID。0.3.5 已在锁屏 Mac 验证休眠显示器唤醒后能启动采集，尚未收到该修复后的手机完整复测结果；不能据此认定锁屏画面和密码输入均可用。
 
@@ -76,7 +94,7 @@ pnpm pack --pack-destination /绝对路径/输出目录
 
 仓库包含已签名助手压缩包，日常网页修改不需要重编原生助手。重编需要 macOS、Swift **6.3.3**（Swift tools 5.10 模式）：先按 `native/vendor-lock.json` 下载 WebRTC **156.0.0**，核对 SHA-256，将 XCFramework 解压为 `native/Vendor/WebRTC.xcframework`，再运行 `pnpm build:agent`。此命令更新助手压缩包、临时签名及清单哈希。
 
-测试覆盖认证、权限、租约、信令隔离、断开清理、唤醒期间取消和缩放坐标。发布验收与尚未覆盖的场景见 [验收记录](docs/validation.md)。
+18 项测试覆盖认证、权限、租约、信令隔离、断开清理、唤醒期间取消、缩放坐标、模式选择与输入合并。发布验收与尚未覆盖的场景见 [验收记录](docs/validation.md)。
 
 ## 许可与反馈
 

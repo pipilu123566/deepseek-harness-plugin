@@ -39,6 +39,13 @@
       <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
 
       <div class="workspace" id="workbench">
+        <div class="capture-settings">
+          <label>显示器 <select id="display-select" aria-label="选择显示器"><option value="0">主显示器</option></select></label>
+          <label>画质 <select id="priority-select" aria-label="选择画质模式"><option value="responsive">流畅优先</option><option value="detail">清晰优先</option></select></label>
+          <details class="connection-metrics"><summary>连接状态</summary>
+          <output id="stream-health" title="输入为操作确认往返；缓冲为视频接收缓冲，不是完整屏幕响应时间。" aria-live="off"></output>
+          <output id="capture-size" aria-live="polite">连接后显示实际分辨率</output></details>
+        </div>
         <section class="desktop-panel" aria-label="电脑画面与控制">
           <div class="desktop-toolbar">
             <div class="viewer-label"><span id="live-dot" class="live-dot" aria-hidden="true"></span><span id="viewer-label">电脑画面</span></div>

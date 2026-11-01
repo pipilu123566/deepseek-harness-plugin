@@ -11,8 +11,17 @@ func emit(_ value: [String: Any]) {
     outputLock.lock(); defer { outputLock.unlock() }
     FileHandle.standardOutput.write(data); FileHandle.standardOutput.write(Data([10]))
 }
+func displayInventory() -> [[String:Any]] {
+    var ids=[CGDirectDisplayID](repeating:0,count:32),count:UInt32=0
+    guard CGGetActiveDisplayList(32,&ids,&count) == .success else{return []}
+    return ids.prefix(Int(count)).map { id in
+        let screen=NSScreen.screens.first { ($0.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.uint32Value==id }
+        let mode=CGDisplayCopyDisplayMode(id)
+        return ["id":id,"name":screen?.localizedName ?? "显示器 \(id)","width":mode?.pixelWidth ?? CGDisplayPixelsWide(id),"height":mode?.pixelHeight ?? CGDisplayPixelsHigh(id),"main":id==CGMainDisplayID()]
+    }
+}
 func permissions() -> [String: Any] {
-    ["type": "permissions", "screen": CGPreflightScreenCaptureAccess(), "input": AXIsProcessTrusted()]
+    ["type": "permissions", "screen": CGPreflightScreenCaptureAccess(), "input": AXIsProcessTrusted(), "displays":displayInventory()]
 }
 
 final class InputController {
@@ -100,6 +109,10 @@ final class DesktopSession: NSObject, RTCPeerConnectionDelegate, RTCDataChannelD
     var timer: DispatchSourceTimer?
     var input: InputController
     var channel: RTCDataChannel?
+    var displayID:CGDirectDisplayID=0
+    var quality="1440"
+    var responsive=true
+    var videoSender:RTCRtpSender?
     var count=0
     var stopping=false
     var candidateQueue: [RTCIceCandidate]=[]
@@ -109,6 +122,10 @@ final class DesktopSession: NSObject, RTCPeerConnectionDelegate, RTCDataChannelD
     func start(_ options:[String:Any]) {
         guard peer == nil else { return }
         if !test && (!CGPreflightScreenCaptureAccess() || !AXIsProcessTrusted()) { emit(permissions());emit(["type":"error","code":"permissions-required"]);return }
+        displayID=CGDirectDisplayID(options["displayId"] as? UInt32 ?? 0)
+        quality=options["quality"] as? String ?? "1440"
+        responsive=(options["priority"] as? String ?? "responsive")=="responsive"
+        guard ["720","1080","1440","2160"].contains(quality) else {emit(["type":"error","code":"invalid-request"]);return}
         let config=RTCConfiguration();config.sdpSemantics = .unifiedPlan
         config.iceServers=(options["iceServers"] as? [[String:Any]] ?? []).compactMap { item in
             let urls=(item["urls"] as? [String]) ?? (item["urls"] as? String).map{[$0]} ?? []
@@ -118,7 +135,7 @@ final class DesktopSession: NSObject, RTCPeerConnectionDelegate, RTCDataChannelD
         peer=factory.peerConnection(with:config,constraints:RTCMediaConstraints(mandatoryConstraints:nil,optionalConstraints:["DtlsSrtpKeyAgreement":"true"]),delegate:self)
         let src=factory.videoSource(forScreenCast:true);source=src;capturer=RTCVideoCapturer(delegate:src)
         let track=factory.videoTrack(with:src,trackId:"desktop-video")
-        peer?.add(track,streamIds:["desktop"])
+        videoSender=peer?.add(track,streamIds:["desktop"])
         if test { startPattern() }
         else { Task { await self.startCapture() } }
         emit(["type":"ready","testPattern":test])
@@ -134,7 +151,7 @@ final class DesktopSession: NSObject, RTCPeerConnectionDelegate, RTCDataChannelD
                 self.peer?.answer(for:RTCMediaConstraints(mandatoryConstraints:nil,optionalConstraints:nil)) { desc,error in
                     guard let desc=desc,error==nil else {emit(["type":"error","code":"negotiation-failed"]);return}
                     self.peer?.setLocalDescription(desc) { error in
-                        if error==nil { emit(["type":"answer","sdp":desc.sdp]) }
+                        if error==nil { self.configureEncoder();emit(["type":"answer","sdp":desc.sdp]) }
                     }
                 }
             }
@@ -143,25 +160,41 @@ final class DesktopSession: NSObject, RTCPeerConnectionDelegate, RTCDataChannelD
             if remoteSet { peer?.add(c,completionHandler:{_ in}) } else if candidateQueue.count<100 {candidateQueue.append(c)}
         } else if type=="stop" { shutdown() }
     }
+    func configureEncoder() {
+        guard let sender=videoSender else{return}
+        let parameters=sender.parameters
+        let bitrate=["720":4_000_000,"1080":8_000_000,"1440":16_000_000,"2160":28_000_000][quality]!
+        for encoding in parameters.encodings {encoding.maxBitrateBps=NSNumber(value:bitrate);encoding.maxFramerate=30}
+        parameters.degradationPreference=NSNumber(value:(responsive ? RTCDegradationPreference.maintainFramerate : RTCDegradationPreference.maintainResolution).rawValue)
+        sender.parameters=parameters
+    }
     @MainActor func startCapture() async {
         do {
             let content=try await SCShareableContent.excludingDesktopWindows(false,onScreenWindowsOnly:true)
-            guard let display=content.displays.first(where:{$0.displayID==CGMainDisplayID()}) ?? content.displays.first else {throw NSError(domain:"display",code:1)}
+            guard let display=content.displays.first(where:{$0.displayID==(displayID==0 ? CGMainDisplayID():displayID)}) else {emit(["type":"error","code":"display-unavailable"]);self.shutdown();return}
             let bounds=CGDisplayBounds(display.displayID);input.bounds=bounds
-            let config=SCStreamConfiguration();let ratio=min(1,1920.0/Double(display.width))
-            config.width=Int(Double(display.width)*ratio)/2*2;config.height=Int(Double(display.height)*ratio)/2*2
-            config.minimumFrameInterval=CMTime(value:1,timescale:30);config.queueDepth=3;config.showsCursor=true;config.capturesAudio=false
+            let config=SCStreamConfiguration()
+            let mode=CGDisplayCopyDisplayMode(display.displayID)
+            let width=mode?.pixelWidth ?? display.width,height=mode?.pixelHeight ?? display.height
+            let target=Double(Int(quality) ?? 1440)
+            let ratio=min(1,min(target*16/9/Double(width),target/Double(height)))
+            config.width=max(2,Int(Double(width)*ratio)/2*2);config.height=max(2,Int(Double(height)*ratio)/2*2)
+            config.minimumFrameInterval=CMTime(value:1,timescale:30);config.queueDepth=2;config.showsCursor=true;config.capturesAudio=false
             config.pixelFormat=kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange
             let capture=SCStream(filter:SCContentFilter(display:display,excludingWindows:[]),configuration:config,delegate:self)
             try capture.addStreamOutput(self,type:.screen,sampleHandlerQueue:DispatchQueue(label:"desktop.capture"))
             if stopping { return };stream=capture
             try await capture.startCapture()
-            emit(["type":"capture","width":config.width,"height":config.height])
+            emit(["type":"capture","width":config.width,"height":config.height,"displayId":display.displayID,"quality":quality])
         } catch { emit(["type":"error","code":"capture-failed"]);self.shutdown() }
     }
     func stream(_ stream:SCStream,didOutputSampleBuffer sampleBuffer:CMSampleBuffer,of type:SCStreamOutputType) {
         guard !stopping,type == .screen,CMSampleBufferIsValid(sampleBuffer),let image=CMSampleBufferGetImageBuffer(sampleBuffer),let cap=capturer else{return}
-        source?.capturer(cap,didCapture:RTCVideoFrame(buffer:RTCCVPixelBuffer(pixelBuffer:image),rotation:._0,timeStampNs:Int64(CACurrentMediaTime()*1_000_000_000)))
+        let time=CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
+        guard time.isFinite else{return}
+        // Do not spend encoder time catching up on obsolete desktop frames.
+        if CACurrentMediaTime()-time>0.15{return}
+        source?.capturer(cap,didCapture:RTCVideoFrame(buffer:RTCCVPixelBuffer(pixelBuffer:image),rotation:._0,timeStampNs:Int64(time*1_000_000_000)))
     }
     func stream(_ stream:SCStream,didStopWithError error:Error) { emit(["type":"error","code":"capture-stopped"]);shutdown() }
     func startPattern() {

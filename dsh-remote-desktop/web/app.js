@@ -1,11 +1,15 @@
 import QRCode from 'qrcode';
+import {createInputSender} from './input.js';
 import {fitView,zoomView,panView,resizeView,remotePoint,MAX_ZOOM} from './view.js';
 const $=id=>document.getElementById(id);
 const video=$('desktop-video'),screen=$('screen'),base=new URL('./',location.href);
 $('back-link').href=new URL('../',base).href;
 let state,ws,pc,channel,config,nativeReady=false,offered=false,active=false,pending=false,generation=0,polling=false,statusUnavailable=false,sequence=0,testPattern=false,handshakeTimer,entry,entryTimer,entryGeneration=0,draftTimer,pan=false;
-let pointers=new Map(),gesture=null,view=null;
+let pointers=new Map(),gesture=null,view=null,statsTimer,previousStats,inputRTT=null;
+const sentAt=new Map();
 const messages={
+ 'input-congested':'操作通道持续拥堵，已安全断开，请降低清晰度后重连。',
+ 'display-unavailable':'所选显示器已断开，请刷新后选择其他显示器。',
  'permissions-required':'请在 Mac 上打开「DeepSeek 远程桌面权限」，授权屏幕录制和辅助功能后重试。',
  'agent-unavailable':'Mac 原生助手尚未就绪，请检查安装后重试。',
  'agent-timeout':'Mac 助手启动超时，请检查权限后重新连接。',
@@ -35,6 +39,7 @@ function render(){
  $('empty-description').textContent=ws?'正在建立画面和操作通道。':busy?'请在原页面断开后再连接。':!ready?'在 Mac 授权屏幕录制和辅助功能后，刷新状态。':'点击「连接这台 Mac」，即可查看和操作当前桌面。';
  for(const b of document.querySelectorAll('[data-key]'))b.disabled=!active;
  for(const id of ['typing-mode','typing-input','send-text','view-mode','pan','zoom-reset'])$(id).disabled=!active;
+ $('display-select').disabled=pending; $('priority-select').disabled=pending;
  renderView();
 }
 async function api(path,body){
@@ -44,12 +49,40 @@ async function api(path,body){
  }finally{clearTimeout(timer);}
 }
 function errorText(e){return messages[e.code]||(e.status===401||e.status===403?'请返回 DeepSeek 重新登录。':'连接暂不可用，请检查电脑和网络后重试。');}
-function send(m){if(!active||channel?.readyState!=='open'||channel.bufferedAmount>65536)return false;channel.send(JSON.stringify({...m,id:++sequence}));return true;}
+const inputSender=createInputSender({
+ buffered:()=>channel?.bufferedAmount??Infinity,
+ write(m){
+  if(!active||channel?.readyState!=='open')return false;
+  const id=++sequence;sentAt.set(id,{time:performance.now(),notify:['text','key','shortcut'].includes(m.type)});
+  if(sentAt.size>128)sentAt.delete(sentAt.keys().next().value);
+  channel.send(JSON.stringify({...m,id}));return true;
+ },onBlocked:()=>failed('input-congested')
+});
+function send(m){return active&&channel?.readyState==='open'?inputSender.send(m):false;}
+async function measureConnection(peer,current){
+ try{
+  const report=await peer.getStats();if(current!==generation)return;
+  let rtt=null,videoStats;
+  report.forEach(r=>{if(r.type==='candidate-pair'&&r.state==='succeeded'&&r.nominated&&Number.isFinite(r.currentRoundTripTime))rtt=Math.round(r.currentRoundTripTime*1000);if(r.type==='inbound-rtp'&&r.kind==='video'&&!r.isRemote)videoStats=r;});
+  const parts=[];if(rtt!==null)parts.push(`网络 ${rtt} ms`);if(inputRTT!==null)parts.push(`输入 ${Math.round(inputRTT)} ms`);
+  if(videoStats){
+   const prev=previousStats;previousStats=videoStats;
+   if(prev){
+    const frames=(videoStats.framesDecoded||0)-(prev.framesDecoded||0),seconds=(videoStats.timestamp-prev.timestamp)/1000;
+    if(seconds>0)parts.push(`画面 ${Math.round(frames/seconds)} FPS`);
+    const emitted=(videoStats.jitterBufferEmittedCount||0)-(prev.jitterBufferEmittedCount||0);
+    if(emitted>0)parts.push(`缓冲 ${Math.round(((videoStats.jitterBufferDelay||0)-(prev.jitterBufferDelay||0))*1000/emitted)} ms`);
+   }
+  }
+  $('stream-health').textContent=parts.join(' · ')||'正在测量连接';
+ }catch{}
+}
+
 function cleanup(){
- generation++;clearTimeout(handshakeTimer);active=false;nativeReady=false;offered=false;config=null;
+ generation++;clearTimeout(handshakeTimer);clearInterval(statsTimer);inputSender.clear();sentAt.clear();inputRTT=null;previousStats=null;$('stream-health').textContent='';active=false;nativeReady=false;offered=false;config=null;
  if(channel?.readyState==='open')channel.send(JSON.stringify({type:'release'}));
  channel?.close();channel=null;pc?.close();pc=null;const old=ws;ws=null;old?.close();
- video.srcObject=null;view=null;gesture=null;clearDraft();pointers.clear();render();
+ video.srcObject=null;$('capture-size').textContent='连接后显示实际分辨率';view=null;gesture=null;clearDraft();pointers.clear();render();
 }
 async function disconnect(){
  cleanup();pending=true;render();
@@ -57,7 +90,7 @@ async function disconnect(){
 }
 async function refresh(){
  if(pending||polling)return;polling=true;
- try{state=await api('status');if(statusUnavailable){statusUnavailable=false;notice();}if(ws&&(!state.owned||state.phase==='idle')){cleanup();notice('连接已结束，可重新连接。');}render();}
+ try{state=await api('status');renderDisplays();if(statusUnavailable){statusUnavailable=false;notice();}if(ws&&(!state.owned||state.phase==='idle')){cleanup();notice('连接已结束，可重新连接。');}render();}
  catch(e){if(e.status===401||e.status===403){if(ws)cleanup();notice(errorText(e));}else{statusUnavailable=true;notice(ws?'暂时无法更新连接状态，正在重试。':errorText(e));}}finally{polling=false;}
 }
 function failed(code){cleanup();notice(messages[code]||'连接已断开，请重新连接。');refresh();}
@@ -67,12 +100,14 @@ async function negotiate(){
  try{
   const peer=new RTCPeerConnection({iceServers:config.iceServers,iceTransportPolicy:config.relayOnly?'relay':'all'});pc=peer;
   const tr=peer.addTransceiver('video',{direction:'recvonly'});
+  try{if('jitterBufferTarget' in tr.receiver)tr.receiver.jitterBufferTarget=0;}catch{}
+  statsTimer=setInterval(()=>measureConnection(peer,current),2000);
   const codecs=RTCRtpReceiver.getCapabilities?.('video')?.codecs;
   if(codecs&&tr.setCodecPreferences)tr.setCodecPreferences([...codecs.filter(c=>c.mimeType==='video/H264'),...codecs.filter(c=>c.mimeType!=='video/H264')]);
   const dc=peer.createDataChannel('input',{ordered:true});channel=dc;
   function checkConnected(){if(current!==generation)return;active=dc.readyState==='open'&&['connected','completed'].includes(peer.iceConnectionState)&&video.readyState>=2;if(active){clearTimeout(handshakeTimer);notice();video.play().catch(()=>{});$('connection-detail').textContent=testPattern?'测试画面已连接':'桌面已连接';}render();}
   dc.onopen=checkConnected;video.onloadeddata=checkConnected;
-  dc.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch{return;}if(m.type==='ack'){$('input-note').textContent=m.ok?(testPattern?'测试输入已确认，未操作 Mac。':'已输入到电脑。'):'输入未执行，请确认 Mac 辅助功能权限。';$('input-note').dataset.ack=String(m.id);}};
+  dc.onmessage=e=>{let m;try{m=JSON.parse(e.data);}catch{return;}if(m.type==='ack'){const sent=sentAt.get(m.id);if(sent){inputRTT=performance.now()-sent.time;sentAt.delete(m.id);}if(!sent?.notify)return;$('input-note').textContent=m.ok?(testPattern?'测试输入已确认，未操作 Mac。':'已输入到电脑。'):'输入未执行，请确认 Mac 辅助功能权限。';$('input-note').dataset.ack=String(m.id);}};
   dc.onclose=()=>{if(current===generation)failed();};
   peer.onicecandidate=e=>{if(current===generation&&e.candidate&&ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'candidate',candidate:e.candidate.candidate,sdpMid:e.candidate.sdpMid,sdpMLineIndex:e.candidate.sdpMLineIndex}));};
   peer.ontrack=e=>{if(current!==generation)return;video.srcObject=e.streams[0]||new MediaStream([e.track]);video.play().catch(()=>{});};
@@ -84,7 +119,7 @@ async function negotiate(){
 async function connect(){
  if(pending||ws)return;pending=true;notice();render();
  try{
-  state=await api('connect',{});const current=++generation;nativeReady=false;config=null;offered=false;
+  state=await api('connect',{displayId:Number($('display-select').value),priority:$('priority-select').value});const current=++generation;nativeReady=false;config=null;offered=false;
   const url=new URL('socket',base);url.protocol=url.protocol==='https:'?'wss:':'ws:';
   const socket=new WebSocket(url);ws=socket;
   socket.onmessage=async e=>{
@@ -94,6 +129,7 @@ async function connect(){
    else if(m.type==='ready'){nativeReady=true;negotiate();}
    else if(m.type==='answer'){try{await pc?.setRemoteDescription({type:'answer',sdp:m.sdp});for(const c of candidates)await pc?.addIceCandidate(c);candidates=[];}catch{failed('negotiation-failed');}}
    else if(m.type==='candidate'){const c={candidate:m.candidate,sdpMid:m.sdpMid,sdpMLineIndex:m.sdpMLineIndex};if(pc?.remoteDescription)pc.addIceCandidate(c).catch(()=>failed('negotiation-failed'));else candidates.push(c);}
+   else if(m.type==='capture'){$('capture-size').textContent=`采集 ${m.width} × ${m.height}`;}
    else if(m.type==='error')failed(m.code);
    else if(m.type==='closed')failed();
   };
@@ -102,6 +138,21 @@ async function connect(){
   handshakeTimer=setTimeout(()=>{if(current===generation)failed('negotiation-failed');},30000);
  }catch(e){notice(errorText(e));}finally{pending=false;render();}
 }
+function renderDisplays(){
+ const select=$('display-select'), selected=select.value;
+ const displays=state?.native?.displays||[];
+ const key=JSON.stringify(displays);
+ if(select.dataset.inventory===key)return;
+ select.dataset.inventory=key;select.replaceChildren(new Option('主显示器','0'));
+ for(const d of displays)select.add(new Option(`${d.name} · ${d.width}×${d.height}${d.main?'（主屏）':''}`,String(d.id)));
+ select.value=[...select.options].some(o=>o.value===selected)?selected:'0';
+}
+async function changeCapture(){
+ if(pending)return;
+ if(ws){await disconnect();if(!pending)await connect();}
+}
+$('display-select').addEventListener('change',changeCapture);
+$('priority-select').addEventListener('change',changeCapture);
 const mods=e=>({meta:e.metaKey,ctrl:e.ctrlKey,shift:e.shiftKey,alt:e.altKey});
 function local(e){const r=screen.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};}
 function point(e){return view?remotePoint(view,local(e)):{x:0,y:0};}
@@ -121,6 +172,7 @@ function pointer(action,e){send({type:'pointer',action,button:e.button===2?2:0,.
 function touches(){return [...pointers.values()].filter(p=>p.touch);}
 function pair(){const [a,b]=touches();return{center:{x:(a.x+b.x)/2,y:(a.y+b.y)/2},distance:Math.hypot(a.x-b.x,a.y-b.y)};}
 video.addEventListener('loadedmetadata',()=>layoutView(true));
+video.addEventListener('resize',()=>{layoutView(true);if(video.videoWidth)$('capture-size').textContent=`接收 ${video.videoWidth} × ${video.videoHeight}`;});
 new ResizeObserver(()=>layoutView()).observe(screen);
 video.addEventListener('pointerdown',e=>{
  if(!active)return;e.preventDefault();video.focus();video.setPointerCapture(e.pointerId);
