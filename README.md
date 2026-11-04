@@ -2,7 +2,43 @@
 
 中文 | [English](README.en.md)
 
-独立开发的 DeepSeek Harness 社区插件集合。每个插件在一个独立子目录中维护源码、依赖、测试和说明，并单独发布安装包。
+为 DeepSeek Harness 添加余额与消耗查看、Mac 远程操作和本地文档库。按需要选择插件，查看效果后进入对应说明安装。
+
+## 插件
+
+### 余额与消耗 · DSH Balance 1.1.0
+
+想知道账户还剩多少、今天花了多少、费用集中在哪段会话？在侧栏查看余额和费用估算，按模型或会话展开，并设置自己的模型单价。
+
+[![余额与消耗功能原型](dsh-balance/media/balance-1.1.0-overview.zh.png)](dsh-balance/README.md#使用演示)
+
+1.1.0 功能原型，金额与单价为演示数据。[查看演示与安装说明](dsh-balance/README.md) · [下载 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0)
+
+### 远程桌面 · 0.4.2 预览版
+
+通过电脑、手机或 iPad 的浏览器查看和操作 Mac，支持键鼠输入与触摸缩放。被控电脑需为 Apple Silicon Mac，运行 macOS 13 或以上；连接条件和已验证范围见插件说明。
+
+[![远程桌面操作流程示意](dsh-remote-desktop/media/remote-0.4.2-workflow.zh.png)](dsh-remote-desktop/README.md#使用演示)
+
+0.4.2 操作流程示意，非界面实录。[查看演示与安装说明](dsh-remote-desktop/README.md) · [下载预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2)
+
+### 文档库 · 0.3.0
+
+在会话旁浏览和编辑本地资料，随手追加到 Inbox，再把选段引用到会话输入框。编辑会写回原文件，引用后由你确认发送。
+
+[![文档库引用功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示)
+
+0.3.0 功能原型，使用演示文档。[查看演示与安装说明](dsh-documents/README.md) · [下载 0.3.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0)
+
+## 开始使用
+
+当前公开版本适配 **DeepSeek Harness 0.2.1-rc.5**，平台和功能范围以各插件说明为准。
+
+1. 选择上面的插件，打开其安装说明。
+2. 下载该插件 Release 中的 `.tgz`，按已验证步骤安装。
+3. 打开插件，完成首次配置或操作。
+
+本仓库提供多个独立插件，安装时选择对应插件包；仓库根地址和 GitHub 自动生成的源码压缩包不能代替安装包。
 
 ## 开发与维护说明
 
@@ -12,48 +48,10 @@
 
 我还是编程新手，这些插件全部通过 AI 开发完成。代码和设计如有不足，欢迎指正。
 
-## 插件
 
-| 插件 | 用途 | 已发布版本与安装 | 兼容宿主 |
-| --- | --- | --- | --- |
-| [DSH Balance](dsh-balance/README.md) | 查看账户余额、今日及会话消耗，配置模型单价 | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
-| [DSH 远程桌面](dsh-remote-desktop/README.md) | 电脑与手机浏览器远控 Mac、键鼠映射和触摸缩放 | [0.4.2 预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2) | DeepSeek Harness 0.2.1-rc.5 |
-| [DSH 文档库](dsh-documents/README.md) | 本地文档浏览、固定 Inbox、实时预览与自动保存、手动引用 | [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0) | DeepSeek Harness 0.2.1-rc.5 |
+## 反馈与贡献
 
-各插件的功能、安装步骤和支持范围见对应目录的说明。
-
-### 使用演示
-
-以下包含实际插件界面与功能原型，具体来源见对应插件首页。点击预览进入插件首页，查看完整动图、静态分步和支持范围。
-
-| 余额与消耗 · 1.1.0 | 远程桌面 · 0.4.2 预览版 | 文档库 · 0.3.0 |
-| --- | --- | --- |
-| [![余额与消耗功能原型](dsh-balance/media/balance-1.1.0-overview.zh.png)](dsh-balance/README.md#使用演示) | [![远程桌面操作流程示意](dsh-remote-desktop/media/remote-0.4.2-workflow.zh.png)](dsh-remote-desktop/README.md#使用演示) | [![文档库功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示) |
-| 看余额、设置单价、按会话查看费用估算 | 顶部选屏幕和画质、直接输入、电脑键鼠与触屏操作 | 找文档、追加 Inbox、引用到会话 |
-
-仓库根目录不是插件。安装时进入对应插件说明，下载该插件的 Release `.tgz`，不要把本仓库根地址直接交给插件安装命令。已发布版本的支持范围以其 README 和验收记录为准。
-
-## 目录与开发
-
-```text
-deepseek-harness-plugin/
-├── README.md
-├── README.en.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── dsh-balance/
-└── dsh-documents/
-    ├── package.json
-    ├── pnpm-lock.yaml
-    ├── README.md
-    ├── README.en.md
-    ├── LICENSE
-    └── 源码、测试与文档
-```
-
-后续插件在根下新建独立目录；每个目录保留自己的版本、依赖、锁文件、测试与安装说明。开发和打包在目标插件目录内执行，不需要同时安装所有插件的依赖。详见[贡献与发布约定](CONTRIBUTING.md)。
-
-问题反馈请在 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 中注明插件名称、版本和宿主版本。余额插件的[官方展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/11526)继续使用原帖。
+遇到问题，请在 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 中注明插件名称、版本和宿主版本。参与开发请阅读[贡献与发布约定](CONTRIBUTING.md)；余额插件也可在[官方展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/11526)交流。
 
 ## 许可证
 

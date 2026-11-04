@@ -2,7 +2,43 @@
 
 [中文](README.md) | English
 
-A collection of independently developed community plugins for DeepSeek Harness. Each plugin has its own directory for source, dependencies, tests and documentation, and is released as a separate installable package.
+Add balance and spending insights, Mac remote control, and a local document library to DeepSeek Harness. Choose a plugin, see it in action, and follow its installation guide.
+
+## Plugins
+
+### Balances and spending · DSH Balance 1.1.0
+
+See what remains in your accounts, how much you spent today, and which sessions account for the costs. Inspect model or session breakdowns in the sidebar and set your own model prices.
+
+[![Balance feature prototype](dsh-balance/media/balance-1.1.0-overview.en.png)](dsh-balance/README.en.md#see-the-workflow)
+
+A 1.1.0 feature prototype with demonstration amounts and prices. [Demo and installation](dsh-balance/README.en.md) · [Download 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0)
+
+### Remote Desktop · 0.4.2 preview
+
+View and control a Mac from a computer, phone or iPad browser, with keyboard/mouse input and touch zoom. The controlled computer requires an Apple Silicon Mac running macOS 13 or later; see the plugin guide for connection requirements and verified coverage.
+
+[![Remote Desktop workflow illustration](dsh-remote-desktop/media/remote-0.4.2-workflow.en.png)](dsh-remote-desktop/README.en.md#see-the-workflow)
+
+A 0.4.2 workflow illustration, not a screen recording. [Demo and installation](dsh-remote-desktop/README.en.md) · [Download preview](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2)
+
+### Documents · 0.3.0
+
+Browse and edit local references beside a conversation, append notes to an Inbox, then quote a selection into the message draft. Edits write back to the original file; you review and send quoted text yourself.
+
+[![Documents quoting feature prototype](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow)
+
+A 0.3.0 feature prototype using demonstration documents. [Demo and installation](dsh-documents/README.en.md) · [Download 0.3.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0)
+
+## Get started
+
+Current public releases target **DeepSeek Harness 0.2.1-rc.5**. See each plugin's documentation for platform and feature coverage.
+
+1. Choose a plugin above and open its installation guide.
+2. Download its Release `.tgz` and follow the verified steps.
+3. Open the plugin and complete its initial setup or first action.
+
+This repository contains separate plugins. Select the corresponding plugin package; the repository root URL and GitHub's automatically generated source archives do not replace an installable package.
 
 ## Development and maintenance
 
@@ -12,48 +48,10 @@ Questions and suggestions are welcome in [Issues](https://github.com/pipilu12356
 
 I am a programming beginner, and all these plugins were developed using AI. Feedback on shortcomings in the code or design is welcome.
 
-## Plugins
 
-| Plugin | Purpose | Published version and installation | Compatible host |
-| --- | --- | --- | --- |
-| [DSH Balance](dsh-balance/README.en.md) | View balances, daily and session costs, and configure model prices | [1.1.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) | DeepSeek Harness 0.2.1-rc.5 |
-| [DSH Remote Desktop](dsh-remote-desktop/README.en.md) | Control a Mac from computer/mobile browsers, with keyboard mapping and touch zoom | [0.4.2 preview](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2) | DeepSeek Harness 0.2.1-rc.5 |
-| [DSH Documents](dsh-documents/README.en.md) | Browse local files, append to Inbox, live preview, autosave and quote into drafts | [0.3.0 Release](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0) | DeepSeek Harness 0.2.1-rc.5 |
+## Feedback and contributing
 
-See each plugin's documentation for its features, installation steps and support scope.
-
-### See the workflows
-
-These previews include actual plugin UI and feature prototypes; see the plugin homepages for source labels. Select a preview for the complete animation, static steps and support scope on the plugin’s home page.
-
-| Balance · 1.1.0 | Remote Desktop · 0.4.2 preview | Documents · 0.3.0 |
-| --- | --- | --- |
-| [![Balance feature prototype](dsh-balance/media/balance-1.1.0-overview.en.png)](dsh-balance/README.en.md#see-the-workflow) | [![Remote Desktop workflow illustration](dsh-remote-desktop/media/remote-0.4.2-workflow.en.png)](dsh-remote-desktop/README.en.md#see-the-workflow) | [![Documents feature prototype](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow) |
-| Inspect balances, set model prices and review session cost estimates | Top-bar settings, direct typing, computer controls and touch gestures | Find documents, append to Inbox and quote into a conversation |
-
-The repository root is not a plugin. Follow the selected plugin's documentation and download its Release `.tgz`; do not pass the collection's root URL directly to the plugin installer. Support claims are defined by each published version's README and validation record.
-
-## Structure and development
-
-```text
-deepseek-harness-plugin/
-├── README.md
-├── README.en.md
-├── CONTRIBUTING.md
-├── LICENSE
-├── dsh-balance/
-└── dsh-documents/
-    ├── package.json
-    ├── pnpm-lock.yaml
-    ├── README.md
-    ├── README.en.md
-    ├── LICENSE
-    └── Source, tests and documentation
-```
-
-Add future plugins as separate top-level directories. Each keeps its own version, dependencies, lockfile, tests and installation instructions. Develop and build inside the target plugin directory; installing every plugin's dependencies is unnecessary. See the [contribution and release conventions](CONTRIBUTING.md).
-
-For problems, include the plugin name, plugin version and host version in [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues). DSH Balance continues to use its existing [official community showcase thread](https://github.com/deepseek-ai/deepseek-harness/discussions/11526).
+For problems, include the plugin name, plugin version and host version in [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues). Read the [contribution and release conventions](CONTRIBUTING.md) to contribute. You can also discuss DSH Balance in its [official community showcase thread](https://github.com/deepseek-ai/deepseek-harness/discussions/11526).
 
 ## License
 

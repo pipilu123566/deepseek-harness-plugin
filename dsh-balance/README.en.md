@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-View account balances, today's model costs and session spending from the DeepSeek Harness sidebar, and configure prices for individual models.
+See what remains in your accounts, how much you spent today, and where the costs come from by model or session, all in the DeepSeek Harness sidebar.
 
 [Download 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [Report a problem](https://github.com/pipilu123566/deepseek-harness-plugin/issues)
 
@@ -12,21 +12,32 @@ Open the sidebar wallet → inspect balances and daily spending → save model p
 
 ![DSH Balance 1.1.0 feature prototype: open the overview, save model prices and recalculate, then inspect session costs](https://raw.githubusercontent.com/pipilu123566/deepseek-harness-plugin/main/dsh-balance/media/balance-1.1.0-workflow.en.gif)
 
-An approximately 14-second loop illustrating 1.1.0 features, not a screen recording. Amounts, models and prices are demo data, not real balances, official rates or invoices. Static steps: [Overview](media/balance-1.1.0-overview.en.png) · [Model prices](media/balance-1.1.0-prices.en.png) · [Session spending](media/balance-1.1.0-sessions.en.png). An [actual runtime screenshot using demo data](docs/images/balance-1.1.0-demo.png) is also available.
+A 1.1.0 feature prototype, not a screen recording. Amounts, models and prices are demonstration data, not real balances, official rates or invoices.
 
-## Features
+<details>
+<summary>Static steps and an actual runtime screenshot</summary>
 
-- Hover, focus or click the wallet button to open or pin the panel. Close it with Escape, the close button or an outside click.
-- See available balances and daily spending in the overview. Expand a provider for wallet details and timestamps; multiple models from one provider share a single balance row.
-- View daily costs by model or session, expand a session for its model breakdown, and see costs at the end of each assistant turn.
-- Set input, output, cache-read and cache-write prices for an exact provider/model in the price editor. Saving recalculates estimates and persists across restarts.
-- Overview amounts use two decimal places; expanded details retain precision. Currencies remain separate without exchange-rate conversion.
-- Provider and cost lists scroll within a bounded area. Refresh manually or once per minute while the panel is open; polling stops when it closes.
-- Missing credentials, unsupported providers, rate limits, failures, missing prices and missing usage remain explicit instead of appearing as zero balances or zero costs.
+ [Overview](media/balance-1.1.0-overview.en.png) · [Model prices](media/balance-1.1.0-prices.en.png) · [Session spending](media/balance-1.1.0-sessions.en.png). An [actual runtime screenshot using demo data](docs/images/balance-1.1.0-demo.png) is also available.
+
+</details>
+
+## What you can do
+
+### Check account balances
+
+Open the sidebar wallet to see available balances for configured providers. Expand a provider for top-up, granted funds and timestamps. Multiple models from the same provider share one row; currencies stay separate.
+
+### Find where the costs come from
+
+Open “Today's spending” to inspect model or session costs and expand a session's model breakdown. Each reply also shows its turn cost. Amounts estimate recorded usage in the current host, rather than provider bills.
+
+### Set prices for your models
+
+In “Prices”, choose an exact provider/model and enter input, output and optional cache prices. Saving recalculates estimates and persists across restarts. Missing prices and usage remain explicit.
 
 ## Compatibility
 
-1.1.0 declares compatibility only with **DeepSeek Harness 0.2.1-rc.5**. The wallet occupies its own sidebar footer row above the account button. Other host versions need separate verification.
+For **DeepSeek Harness 0.2.1-rc.5**. The wallet appears above the account button in the sidebar footer. Other host versions have not been verified.
 
 These plugins are primarily built for the author's own needs and have not undergone comprehensive compatibility testing. See the [validation record](docs/validation.en.md) for the public release's tested platforms, installation and interaction coverage.
 
@@ -40,6 +51,17 @@ These plugins are primarily built for the author's own needs and have not underg
    ```
 
 3. Reopen Harness and find the wallet button at the bottom of the sidebar. Configure provider connections in the existing Harness settings.
+
+## First use
+
+1. Configure provider connections through the existing Harness settings. Sign in through the host when using a DeepSeek signed-in account.
+2. Hover or focus the sidebar wallet to open it, or click to pin it. Close it with Escape, the close button or an outside click.
+3. Open “Today's spending” for model/session breakdowns. If a third-party model is unpriced, open “Prices”, enter its rates, and save to recalculate.
+
+Overview amounts use two decimal places; expanded details retain precision. Provider and detail lists scroll. Refresh runs once per minute while open and stops when closed; manual refresh is available. Missing credentials, unsupported providers, rate limits and failures have distinct states.
+
+<details>
+<summary>macOS CLI path, Web profiles, upgrades and removal</summary>
 
 On macOS, if `dsh` is not on your PATH, use the application's CLI:
 
@@ -55,7 +77,14 @@ To uninstall, quit the target instance, run this command and reopen it:
 dsh plugin --profile desktop remove @pipilu123566/dsh-balance
 ```
 
+</details>
+
 ## Balance sources
+
+Supports DeepSeek signed-in accounts, DeepSeek API, OpenRouter and SiliconFlow. OpenRouter balance queries require a management key. Prices can still be set for other configured models to estimate costs.
+
+<details>
+<summary>Provider support and query requirements</summary>
 
 | Provider | Source | Requirements and limits |
 | --- | --- | --- |
@@ -70,7 +99,16 @@ API references: [DeepSeek](https://api-docs.deepseek.com/api/get-user-balance/),
 
 Only configured providers are queried. Credentials go only to the corresponding allowlisted HTTPS endpoint. Custom reverse proxies, nonstandard ports, credentials embedded in URLs and redirects are rejected. A balance is a timestamped snapshot, not a live account-change feed.
 
+</details>
+
 ## Usage and pricing
+
+Days use Beijing time. Totals cover recorded, priced model calls in this host, excluding other devices, unrecorded requests and tool charges such as search or fetch. Currencies remain separate; missing prices or usage are marked as partial estimates.
+
+Built-in official prices use the 2026-10-30 snapshot and apply to 2026-09-19 through 2026-12-31. The table does not update automatically. Custom prices recalculate existing records.
+
+<details>
+<summary>Accounting scope, price validity and custom-price rules</summary>
 
 Amounts are **model-cost estimates, not provider billing statements**. They cover recorded model usage in sessions accessible to the current host, excluding other devices, unrecorded requests and tool charges such as search or fetch. Days use Beijing time. Inherited fork calls are not charged twice, and reasoning tokens already included in output are not counted again.
 
@@ -80,9 +118,14 @@ Built-in prices for official DeepSeek routes use the [official CNY prices checke
 
 Custom prices are keyed by exact `provider/model`, support CNY and USD, and use currency per million tokens with up to eight decimal places. Input and output prices are required. An empty cache price means unpriced; enter `0` only for a free category. Saving recalculates existing records with the current settings, which cannot reconstruct historical provider tariffs or actual bills. Reset restores built-in pricing on supported official routes and leaves other routes unpriced. Concurrent configuration changes are rejected; reload before editing again.
 
+</details>
+
 ## Data and development
 
 API keys and raw provider responses stay on the Host. The client receives display fields such as balances, usage, model identifiers and session titles, not conversation bodies. The plugin adds no analytics or separate backend. Balance queries do not append session events; prices are saved through Harness settings.
+
+<details>
+<summary>Development environment and implementation</summary>
 
 Use the pinned Node **22.21.1**, pnpm **10.33.2** and lockfile inside the plugin directory:
 
@@ -93,6 +136,8 @@ pnpm pack --out /path/to/output/dsh-balance.tgz
 ```
 
 The Host uses Cordis, Typert, session queries and projections. The client reuses the host's React, theme and locale services and renders in public sidebar and turn-tail slots. Disposal releases listeners, timers, popovers, observation leases and in-flight requests. See [contributing](CONTRIBUTING.md) and the [validation record](docs/validation.en.md).
+
+</details>
 
 ## License
 
