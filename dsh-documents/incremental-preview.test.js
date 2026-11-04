@@ -1,0 +1,18 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {EditorState,StateEffect} from '@codemirror/state';import {codeFolding,ensureSyntaxTree} from '@codemirror/language';
+import {markdownSupport,liveField} from './live-preview.js';
+const make=(doc,pos=doc.length)=>EditorState.create({doc,selection:{anchor:pos},extensions:[markdownSupport(),codeFolding(),liveField]});
+function ranges(state){const result=[];state.field(liveField).between(0,state.doc.length,(from,to,x)=>{const w=x.spec.widget;result.push({from,to,class:x.spec.class,widget:w?.constructor.name,text:w?.text,label:w?.label,code:w?.block?.code,target:w?.target,checked:w?.checked});});return result.sort((a,b)=>a.from-b.from||a.to-b.to||JSON.stringify(a).localeCompare(JSON.stringify(b)));}
+test('incremental plain typing, caret moves and structural edits match a fresh full preview',()=>{
+ let s=make('# 标题\n\n正文 **强调** 与 [[文档]]。\n\n- [ ] 待办\n\n```sql\nselect 1;\n```\n\n## 子节\n结尾\n');
+ for(const insert of ['中文','A','1',' ','.','\n','## 新标题','\n','正文']){const pos=s.doc.toString().indexOf('正文')+2;s=s.update({selection:{anchor:pos}}).state;s=s.update({changes:{from:pos,insert},selection:{anchor:pos+insert.length}}).state;assert.deepEqual(ranges(s),ranges(make(s.doc.toString(),s.selection.main.head)),insert);}
+ for(const anchor of [2,s.doc.length,6,s.doc.length-3]){s=s.update({selection:{anchor}}).state;assert.deepEqual(ranges(s),ranges(make(s.doc.toString(),anchor)));}
+ s=s.update({selection:{anchor:0,head:s.doc.length}}).state;assert.deepEqual(ranges(s),ranges(EditorState.create({doc:s.doc,selection:s.selection,extensions:[markdownSupport(),codeFolding(),liveField]})));
+});
+test('caret movement within a line reuses the decoration set',()=>{let s=make('正文 **加粗**\n',2);const old=s.field(liveField);s=s.update({selection:{anchor:3}}).state;assert.equal(s.field(liveField),old);});
+test('deterministic edits throughout mixed Markdown preserve the full-render result',()=>{
+ let s=make('---\ntitle: 元数据\n---\n\n# 标题\n\n正文 **强调** 与 [[文档]]。\n\n- [ ] 待办\n\n> 引用文字\n\n```sql\nselect 1;\n```\n\n![[图片.png]]\n\n| A | B |\n| - | - |\n| 1 | 2 |\n\n## 后文\n正文结尾');let seed=7;
+ for(let i=0;i<100;i++){seed=(Math.imul(seed,1664525)+1013904223)>>>0;const pos=seed%(s.doc.length+1);s=s.update({selection:{anchor:pos}}).state;s=s.update({changes:{from:pos,insert:i%5===0?' ':i%3===0?'文':'a'},selection:{anchor:pos+1}}).state;assert.deepEqual(ranges(s),ranges(make(s.doc.toString(),s.selection.main.head)),`edit ${i} at ${pos}`);}
+});
+test('unchanged rendered blocks can retain their DOM when an earlier structural edit moves them',()=>{let s=make('# 标题\n\n正文\n\n```sql\nselect 1;\n```\n\n结尾');let old; s.field(liveField).between(0,s.doc.length,(from,to,d)=>{if(d.spec.widget?.constructor.name==='CodePreview')old={from,widget:d.spec.widget};});s=s.update({changes:{from:0,insert:'前置段落\n\n'}}).state;let next;s.field(liveField).between(0,s.doc.length,(from,to,d)=>{if(d.spec.widget?.constructor.name==='CodePreview')next={from,widget:d.spec.widget};});assert.notEqual(old.from,next.from);assert.equal(old.widget.eq(next.widget),true);});
+test('background parsing progress is not lost when a plain edit arrives before its state update',()=>{const text=Array.from({length:600},(_,i)=>`## 章节 ${i}\n\n正文内容 **加粗**。\n\n`).join('')+'末尾正文';let s=make(text);assert(ensureSyntaxTree(s,s.doc.length,3000));s=s.update({changes:{from:s.doc.length,insert:'字'},selection:{anchor:s.doc.length+1}}).state;let reference=make(s.doc.toString(),s.selection.main.head);ensureSyntaxTree(reference,reference.doc.length,3000);reference=reference.update({effects:StateEffect.appendConfig.of([])}).state;assert.deepEqual(ranges(s),ranges(reference));});

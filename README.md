@@ -22,13 +22,13 @@
 
 0.4.2 操作流程示意，非界面实录。[查看演示与安装说明](dsh-remote-desktop/README.md) · [下载预览版](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2)
 
-### 文档库 · 0.3.0
+### 文档库 · 0.9.0
 
-在会话旁浏览和编辑本地资料，随手追加到 Inbox，再把选段引用到会话输入框。编辑会写回原文件，引用后由你确认发送。
+在会话旁浏览和编辑资料，随手记到 Inbox，再把选段引用给 AI；也可复用官方文件树，直接用实时预览编辑 Markdown。支持文档大纲、属性折叠、表格与代码块，编辑写回原文件。
 
-[![文档库引用功能原型](dsh-documents/media/documents-0.3.0-quote.zh.png)](dsh-documents/README.md#使用演示)
+[![文档库 0.9.0 实际编辑界面](dsh-documents/media/documents-0.9.0-editor.png)](dsh-documents/README.md#使用演示)
 
-0.3.0 功能原型，使用演示文档。[查看演示与安装说明](dsh-documents/README.md) · [下载 0.3.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0)
+0.9.0 实际 Web 界面，使用临时演示文档。[查看演示与安装说明](dsh-documents/README.md) · [下载 0.9.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.9.0)
 
 ## 开始使用
 

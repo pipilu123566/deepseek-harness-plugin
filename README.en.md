@@ -22,13 +22,13 @@ View and control a Mac from a computer, phone or iPad browser, with keyboard/mou
 
 A 0.4.2 workflow illustration, not a screen recording. [Demo and installation](dsh-remote-desktop/README.en.md) · [Download preview](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu%2Fdsh-remote-desktop%400.4.2)
 
-### Documents · 0.3.0
+### Documents · 0.9.0
 
-Browse and edit local references beside a conversation, append notes to an Inbox, then quote a selection into the message draft. Edits write back to the original file; you review and send quoted text yourself.
+Browse and edit documents alongside conversations, capture notes into Inbox and quote selections for AI. Optionally reuse the official file tree to edit Markdown with live preview, outline navigation, collapsed properties, tables and code blocks. Edits save to the original files.
 
-[![Documents quoting feature prototype](dsh-documents/media/documents-0.3.0-quote.en.png)](dsh-documents/README.en.md#see-the-workflow)
+[![Documents 0.9.0 actual editor](dsh-documents/media/documents-0.9.0-editor.png)](dsh-documents/README.en.md#see-the-workflow)
 
-A 0.3.0 feature prototype using demonstration documents. [Demo and installation](dsh-documents/README.en.md) · [Download 0.3.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.3.0)
+Actual 0.9.0 Web interface using temporary demo documents. [Demo and installation](dsh-documents/README.en.md) · [Download 0.9.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-documents%400.9.0)
 
 ## Get started
 

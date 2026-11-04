@@ -1,6 +1,6 @@
 # 第三方许可证 / Third-party notices
 
-`client.js` includes code from the following packages. Their licenses apply to those portions; the plugin’s own code is MIT licensed. Versions come from the committed lockfile and the client build.
+`client.js`, `capture.html` and `outline-worker.js` include code from the following packages. Their licenses apply to those portions; the plugin’s own code is MIT licensed. Versions come from the committed lockfile and the client build.
 
 ## @codemirror/autocomplete 6.20.4
 
@@ -1312,6 +1312,45 @@ The bundled DOMPurify file retains this MIT attribution for its regenerator runt
 
 ```text
 Copyright (c) 2014-present, Facebook, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
+## 0.4.0 candidate additions
+
+- `@codemirror/legacy-modes` 6.5.1 — MIT; https://github.com/codemirror/legacy-modes
+- `koffi` 3.1.1 (optional native window dependency) — MIT; https://koffi.dev/
+
+Native window integration uses the existing private quick-capture implementation as a reference; that implementation was developed in this workspace. Public files do not include its runtime settings, drafts or user documents.
+
+## 0.5.0 candidate additions
+
+Mermaid 12.3.0 (MIT), bundled locally for diagram previews. Its runtime dependency license texts are included in [Mermaid dependency licenses](docs/mermaid-third-party.txt). Existing highlight.js 11.11.1 supplies code highlighting.
+
+## @codemirror/search 6.7.2
+
+License: MIT
+
+```text
+MIT License
+
+Copyright (C) 2018-2021 by Marijn Haverbeke <marijn@haverbeke.berlin> and others
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

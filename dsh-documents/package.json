@@ -1,6 +1,6 @@
 {
   "name": "@pipilu123566/dsh-documents",
-  "version": "0.3.0",
+  "version": "0.9.0",
   "description": "Local document library, fixed Inbox and manual references for DSH",
   "type": "module",
   "license": "MIT",
@@ -14,7 +14,14 @@
   "bugs": {
     "url": "https://github.com/pipilu123566/deepseek-harness-plugin/issues"
   },
-  "keywords": ["dsh-plugin", "deepseek-harness", "documents", "markdown", "live-preview", "inbox"],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "documents",
+    "markdown",
+    "live-preview",
+    "inbox"
+  ],
   "engines": {
     "node": ">=24",
     "dsh": "0.2.1-rc.5"
@@ -40,11 +47,38 @@
     ".node-version",
     "client-source.js",
     "live-preview.js",
-    "autosave.js"
+    "autosave.js",
+    "editor-keys.js",
+    "fence-editing.js",
+    "capture.js",
+    "capture-view.js",
+    "native-capture.js",
+    "native-event-pump.js",
+    "capture-native-source.js",
+    "capture.html",
+    "build.mjs",
+    "code-preview.js",
+    "explorer-ui.js",
+    "recovery.js",
+    "outline.js",
+    "view-memory.js",
+    "editor-format.js",
+    "find-panel.js",
+    "outline-core.js",
+    "outline-worker.js",
+    "outline-worker-source.js",
+    "document-navigation.js",
+    "properties-view.js",
+    "table-model.js",
+    "table-view.js",
+    "workspace-documents.js",
+    "workspace-preview.js",
+    "workspace-address.js",
+    "workspace-browser-recovery.js"
   ],
   "scripts": {
     "test": "node --test *.test.js",
-    "build": "esbuild client-source.js --bundle --format=iife --outfile=client.js"
+    "build": "node build.mjs"
   },
   "dsh": {
     "bundle": {
@@ -56,7 +90,8 @@
       "inject": [
         "@deepseek-ai/dsh-client-ui-sidebar",
         "@deepseek-ai/dsh-client-ui-sidebar-right",
-        "@deepseek-ai/dsh-client-ui-conversation"
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-sidebar-documentpreview"
       ]
     }
   },
@@ -73,11 +108,17 @@
     "@codemirror/commands": "^6.11.1",
     "@codemirror/lang-markdown": "^6.5.2",
     "@codemirror/language": "^6.13.1",
+    "@codemirror/legacy-modes": "6.5.1",
+    "@codemirror/search": "6.7.2",
     "@codemirror/state": "^6.7.6",
     "@codemirror/view": "^6.43.15",
     "@lezer/highlight": "^1.2.5",
     "dompurify": "3.4.17",
     "highlight.js": "11.11.1",
-    "marked": "15.0.12"
+    "marked": "15.0.12",
+    "mermaid": "12.3.0"
+  },
+  "optionalDependencies": {
+    "koffi": "3.1.1"
   }
 }
