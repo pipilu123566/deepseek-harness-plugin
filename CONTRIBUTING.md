@@ -19,8 +19,6 @@ pnpm test
 
 每个插件独立递增版本，父仓库后续 tag 使用 `<完整包名>@<版本>`，例如 `@pipilu123566/dsh-balance@1.0.1`。Release 标题写插件名与版本，说明对应目录、提交和安装包。不要将某插件的最新 Release 当作整个仓库所有插件的最新版本。
 
-已发布的 tag、Release 附件和校验文件保持不变。后续功能更新递增对应插件版本，并发布新的安装包。
-
 每个 README 提供经过验证的安装入口。仓库根目录不声明 `dsh.bundle`，不能直接作为插件安装；新的 Git 子目录安装方式必须实测后再提供给用户。
 
 English: keep each plugin self-contained, build and test inside its directory, and release it independently. Preserve existing release artifacts and tags. Do not install or publish the collection root as a plugin.
