@@ -2,6 +2,8 @@
 
 [中文](README.md) | English
 
+> **No longer maintained (2026-11-06).** This project receives no further updates, issues are not accepted, and bugs are not fixed. The source and the 1.1.0 package stay as they are, and existing download links keep working. Fork it if you want to keep it going.
+
 See what remains in your accounts, how much you spent today, and where the costs come from by model or session, all in the DeepSeek Harness sidebar.
 
 [Download 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [Report a problem](https://github.com/pipilu123566/deepseek-harness-plugin/issues)

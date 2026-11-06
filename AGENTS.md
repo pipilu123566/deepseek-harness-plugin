@@ -6,4 +6,4 @@
 - Preserve package names, host/client registration identities and declared compatibility unless the task calls for changing them.
 - Public files must not include credentials, enterprise-private adapters, local runtime state, private fixtures or nested Git repositories.
 - Build releases from a clean commit and record the plugin directory, package version, full-package-name@version tag, artifact hash and tested host.
-- The old pipilu123566/dsh-balance repository retains immutable v1.0.0 downloads. New source work belongs here; do not maintain two code copies or overwrite that release.
+- dsh-balance was discontinued on 2026-11-06 and the separate pipilu123566/dsh-balance repository is archived. Its directory stays in this repository read-only for existing users: keep the source, tags and the @pipilu123566/dsh-balance@1.1.0 release immutable, accept no fixes, and release no new versions.

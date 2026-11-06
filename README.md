@@ -2,11 +2,13 @@
 
 中文 | [English](README.en.md)
 
-为 DeepSeek Harness 添加余额与消耗查看、Mac 远程操作和本地文档库。按需要选择插件，查看效果后进入对应说明安装。
+为 DeepSeek Harness 添加 Mac 远程操作和本地文档库。按需要选择插件，查看效果后进入对应说明安装。
 
 ## 插件
 
 ### 余额与消耗 · DSH Balance 1.1.0
+
+> **已停止维护（2026-11-06）。** 不再接受 Issue、不修复问题、不发新版本。源码与 1.1.0 安装包保留原样，已有的下载链接继续有效，供仍在使用的人参考或自行 Fork 继续维护。
 
 想知道账户还剩多少、今天花了多少、费用集中在哪段会话？在侧栏查看余额和费用估算，按模型或会话展开，并设置自己的模型单价。
 
@@ -51,7 +53,7 @@
 
 ## 反馈与贡献
 
-遇到问题，请在 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 中注明插件名称、版本和宿主版本。参与开发请阅读[贡献与发布约定](CONTRIBUTING.md)；余额插件也可在[官方展示帖](https://github.com/deepseek-ai/deepseek-harness/discussions/11526)交流。
+遇到问题，请在 [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues) 中注明插件名称、版本和宿主版本。参与开发请阅读[贡献与发布约定](CONTRIBUTING.md)。
 
 ## 许可证
 

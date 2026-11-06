@@ -2,6 +2,8 @@
 
 中文 | [English](README.en.md)
 
+> **已停止维护（2026-11-06）。** 本项目不再更新，不接受 Issue，也不修复问题。源码和 1.1.0 安装包保留原样，已有下载链接继续有效。需要继续使用时请自行 Fork 维护，或参考同类插件。
+
 在 DeepSeek Harness 侧栏看账户还剩多少、今天花了多少，再按模型或会话找到费用来源。
 
 [下载 1.1.0](https://github.com/pipilu123566/deepseek-harness-plugin/releases/tag/%40pipilu123566%2Fdsh-balance%401.1.0) · [问题反馈](https://github.com/pipilu123566/deepseek-harness-plugin/issues)

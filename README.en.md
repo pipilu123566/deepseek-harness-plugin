@@ -2,11 +2,13 @@
 
 [中文](README.md) | English
 
-Add balance and spending insights, Mac remote control, and a local document library to DeepSeek Harness. Choose a plugin, see it in action, and follow its installation guide.
+Add Mac remote control and a local document library to DeepSeek Harness. Choose a plugin, see it in action, and follow its installation guide.
 
 ## Plugins
 
 ### Balances and spending · DSH Balance 1.1.0
+
+> **No longer maintained (2026-11-06).** Issues are not accepted, bugs are not fixed, and no new versions will be released. The source and the 1.1.0 package stay as they are, and existing download links keep working for anyone still relying on it or forking it.
 
 See what remains in your accounts, how much you spent today, and which sessions account for the costs. Inspect model or session breakdowns in the sidebar and set your own model prices.
 
@@ -51,7 +53,7 @@ I am a programming beginner, and all these plugins were developed using AI. Feed
 
 ## Feedback and contributing
 
-For problems, include the plugin name, plugin version and host version in [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues). Read the [contribution and release conventions](CONTRIBUTING.md) to contribute. You can also discuss DSH Balance in its [official community showcase thread](https://github.com/deepseek-ai/deepseek-harness/discussions/11526).
+For problems, include the plugin name, plugin version and host version in [Issues](https://github.com/pipilu123566/deepseek-harness-plugin/issues). Read the [contribution and release conventions](CONTRIBUTING.md) to contribute.
 
 ## License
 
